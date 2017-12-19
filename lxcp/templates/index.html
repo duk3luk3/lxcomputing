@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Hello{% endblock %}
+{% block content %}
+{% if content and content.links %}
+<p1>Welcome to RBG LXC Compute Cluster</p2>
+<div>
+	Check out these links available to you:
+	<li>
+{% for name, tgt in content.links %}
+	<ul><a href="{{ tgt }}">{{ name }}</a></ul>
+{% endfor %}
+	</li>
+</div>
+{% elif content %}
+	{% if content is mapping %}
+		{% for name, data in content.items() %}
+		{% if data|count > 0 %}
+		<h2>{{name}}</h2>
+		<table>
+		{% for row in data %}
+		{% set row = row.as_dict() if row.as_dict %}
+		{% if loop.index0 == 0 %}
+		<tr>
+		{% for key in row.keys() %}
+		<th>{{key}}</th>
+		{% endfor %}
+		</tr>
+		{% endif %}
+		<tr>
+		{% for key, value in row.items() %}
+		<td>{{value}}</td>
+		{% endfor %}
+		</tr>
+		{% endfor %}
+		</table>
+		{% endif %}
+		{% endfor %}
+	{% else %}
+		{{content}}
+	{% endif %}
+{% endif %}
+{% endblock %}

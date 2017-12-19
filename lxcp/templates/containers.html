@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Container Management{% endblock %}
+{% block content %}
+<h2>Containers and Scheduling</h2>
+
+<strong>Create new Container</strong>
+<form action="/" id="containerNewForm">
+	<table>
+		<tr><th>Name:</th><td><input name="container_name"></td></tr>
+		<tr><th>Host:</th><td>
+                        <select name="container_host">
+                            {% for host in content.hosts %}
+                            <option value="{{host.id}}">{{host.name}}</option>
+                            {% endfor %}
+                        </select>
+                </td></tr>
+		<tr><th>User:</th><td>
+                        <select name="container_user">
+                            {% for user in session_data.user.group.group_members %}
+                            <option value="{{user.id}}">{{user.username}}</option>
+                            {% endfor %}
+                        </select>
+                </td></tr>
+		<tr><td></td><td><input type="submit"></td></tr>
+	</table>
+</form>
+<script>
+const Kitsu = require('kitsu');
+
+const api = new Kitsu({
+    baseURL: 'http://localhost:5000/api',
+    headers: {
+        Authorization: 'foobar'
+    }
+
+});
+$('#containerNewForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        container_name = $form.find("input[name='container_name']").val(),
+        container_host = $form.find("select[name='container_host']").val(),
+        container_user = $form.find("select[name='container_user']").val(),
+
+    container_host = parseInt(container_host);
+    container_user = parseInt(container_user);
+
+    api.create('container', {
+        name: container_name,
+        'user': {
+            'id': container_user,
+            'type': 'users'
+        },
+        'host': {
+            'id': container_host,
+            'type': 'hosts'
+        },
+    }).then(res => console.log(res))
+        .catch((reason) => console.log(reason));
+
+});
+
+</script>
+{% endblock %}
+

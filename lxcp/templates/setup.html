@@ -1,0 +1,19 @@
+{%extends "base.html" %}
+{% block title %}Hello{% endblock %}
+{% block content %}
+<h1>Setup</h1>
+<h2>Populate DB</h2>
+<div>
+	{% if populated %}
+	DB is populated. Delete DB if you want to start over.
+	{% else %}
+	Enter username and password for superuser.
+	<form method="post" action="/setup/db_populate">
+
+		<input type="submit" value="Populate DB" />
+	</table>
+	</form>
+	{% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}User Management{% endblock %}
+{% block content %}
+<h2>Users and Groups</h2>
+
+{% if session_data.user.is_super_admin %}
+<strong>Create new Group</strong><br />
+<form action="/" id="groupNewForm">
+	<table>
+		<tr><th>Name:</th><td><input name="group_name"></td></tr>
+		<tr><td></td><td><input type="submit"></td></tr>
+	</table>
+</form>
+<strong>Create new User</strong><br />
+<form action="/" id="userNewForm">
+	<table>
+		<tr><th>Name:</th><td><input name="user_name"></td></tr>
+		<tr><th>Group:</th><td>
+                        <select name="user_group">
+                            {% for group in content.groups %}
+                            <option value="{{group.id}}">{{group.name}}</option>
+                            {% endfor %}
+                        </select>
+                </td></tr>
+                <tr><th>Admin:</th><td><input type="checkbox" name="user_admin" value="1">Is Admin</td></tr>
+		<tr><td></td><td><input type="submit"></td></tr>
+	</table>
+</form>
+<script>
+const Kitsu = require('kitsu');
+
+const api = new Kitsu({
+    baseURL: 'http://localhost:5000/api',
+    headers: {
+        Authorization: 'foobar'
+    }
+
+});
+
+$(function() {
+    api.get('users').then(res => console.log(res));
+});
+
+$('#groupNewForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        group_name = $form.find("input[name='group_name']").val();
+
+    api.create('group', {
+        name: group_name
+    }).then(res => console.log(res))
+        .catch((reason) => console.log(reason));
+});
+
+$('#userNewForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        user_name = $form.find("input[name='user_name']").val(),
+        user_group = $form.find("select[name='user_group']").val(),
+        user_admin = $form.find("input[name='user_admin']:checked").val() ? true : false ;
+
+    user_group = parseInt(user_group);
+
+    console.log(user_name);
+    console.log(user_group);
+    console.log(user_admin);
+
+    api.create('user', {
+        username: user_name,
+        'is-admin': user_admin,
+        'group': {
+            'id': user_group,
+            'type': 'groups'
+        }
+    }).then(res => console.log(res))
+        .catch((reason) => console.log(reason));
+
+});
+
+function groupDelete(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        group_id = $form.find("input[name='group_id']").val(),
+        group_name = $form.find("input[name='group_name']").val();
+
+    if (confirm('Really delete Group #' + group_id + ' (' + group_name + ')?' )) {
+
+        api.remove('group', group_id).then(function(res) {
+            $('#group'+group_id+'Div').remove();
+        })
+            .catch((reason) => console.log(reason));
+    }
+}
+function userDelete(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        user_id = $form.find("input[name='user_id']").val(),
+        user_name = $form.find("input[name='user_name']").val();
+
+    if (confirm('Really delete User #' + user_id + ' (' + user_name + ')?' )) {
+
+        api.remove('user', user_id).then(function(res) {
+            $('#user'+user_id+'Div').remove();
+        })
+            .catch((reason) => console.log(reason));
+    }
+}
+</script>
+{% endif %}
+
+{% for group in content.groups %}
+<div id="group{{group.id}}Div">
+<h3>{{ group.name }}</h3>
+
+Group ID: {{ group.id }}<br />
+Supergroup: {{ group.is_super }}<br />
+
+{% if session_data.user.is_super_admin %}
+<form action="/" id="group{{group.id}}DeleteForm">
+<input name="group_id" hidden="true" value="{{group.id}}">
+<input name="group_name" hidden="true" value="{{group.name}}">
+<input type="submit" value="Delete Group">
+</form>
+<script>
+$('#group{{group.id}}DeleteForm').submit(groupDelete);
+</script>
+{% endif %}
+
+{% if group.group_members|count > 0 %}
+<strong>Users</strong>
+
+
+<table>
+<tr><th>ID</th><th>Name</th><th>uidNumber</th><th>is_admin</th></tr>
+{% for user in group.group_members %}
+<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.uidNumber}}</td><td>{{ user.is_admin }}</td>
+{% if user.is_writeable_for(session_data.user) %}
+<td>
+<form id="user{{user.id}}DeleteForm">
+<input name="user_id" hidden="true" value="{{user.id}}">
+<input name="user_name" hidden="true" value="{{user.username}}">
+<input type="submit" value="Delete User">
+</form>
+</td>
+<script>
+$('#user{{user.id}}DeleteForm').submit(userDelete);
+</script>
+{% endif %}
+</tr>
+{% endfor %}
+</table>
+{% else %}
+(No Users in this group)
+{% endif %}
+</div>
+{% endfor %}
+
+{% set orphans = content.users|selectattr('group', 'none')|list %}
+{% if orphans|count > 0 %}
+<h3>Orphans</h3>
+<table>
+<tr><th>ID</th><th>Name</th><th>uidNumber</th><th>is_admin</th></tr>
+{% for user in orphans %}
+<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.uidNumber}}</td><td>{{ user.is_admin }}</td>
+{% if user.is_writeable_for(session_data.user) %}
+<td>
+<form id="user{{user.id}}DeleteForm">
+<input name="user_id" hidden="true" value="{{user.id}}">
+<input name="user_name" hidden="true" value="{{user.username}}">
+<input type="submit" value="Delete User">
+</form>
+</td>
+<script>
+$('#user{{user.id}}DeleteForm').submit(userDelete);
+</script>
+{% endif %}
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

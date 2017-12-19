@@ -1,0 +1,8 @@
+#login {
+	float: right;
+	clear: both;
+}
+
+.login_warn {
+	border: 1px solid red;
+}

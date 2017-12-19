@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <link rel="stylesheet" href="/static/style.css" />
+    <title>RBG LXCompute - {% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+   <script src="/static/jquery-3.2.1.js"></script>
+   <script src="/static/bundle.js"></script>
+
+    <div id="login">
+{% block login %}
+{% if session_data and session_data.logged_in %}
+Welcome, {{session_data.name}}. <a href="/logout">Log out</a>
+{% else %}
+<form action="/login" method="POST">
+{% if login_failed %}
+<div class="login_warn">Login failed!</div>
+{% endif %}
+<table>
+    <tr><td>Username</td><td><input name="username" /></td></tr>
+    <tr><td>Password</td><td><input type="password" name="password" /></td></tr>
+    <tr><td></td><td><input type="submit" value="Log In" /></td></tr>
+</table>
+</form>
+{% endif %}
+{% endblock %}
+    </div>
+
+    <div id="content">
+{% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Resource Management{% endblock %}
+{% block content %}
+<h2>Hosts and NFS mappings</h2>
+
+{% if session_data.user.is_super_admin %}
+<strong>Create new Host</strong><br />
+<form action="/" id="hostNewForm">
+	<table>
+		<tr><th>Name:</th><td><input name="host_name"></td></tr>
+		<tr><th>CPU (Cores):</th><td><input name="host_cores"></td></tr>
+		<tr><th>RAM (GB):</th><td><input name="host_ram"></td></tr>
+		<tr><th>HDD Space (TB):</th><td><input name="host_space"></td></tr>
+		<tr><td></td><td><input type="submit"></td></tr>
+	</table>
+</form>
+<strong>Create new NFS mapping</strong><br />
+<form action="/" id="nfsNewForm">
+	<table>
+		<tr><th>Path:</th><td><input name="nfs_path" placeholder="nasxx00:/srv/xx00/path"></td></tr>
+		<tr><th>Mapping:</th><td><input name="nfs_mapping" placeholder="nasxx00.srv.xx00.path"></td></tr>
+		<tr><th>Group:</th><td>
+                        <select name="nfs_group">
+                            {% for group in content.groups %}
+                            <option value="{{group.id}}">{{group.name}}</option>
+                            {% endfor %}
+                        </select>
+                </td></tr>
+		<tr><td></td><td><input type="submit"></td></tr>
+	</table>
+</form>
+<script>
+const Kitsu = require('kitsu');
+
+const api = new Kitsu({
+    baseURL: 'http://localhost:5000/api',
+    headers: {
+        Authorization: 'foobar'
+    }
+
+});
+
+$('#hostNewForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        host_name = $form.find("input[name='host_name']").val(),
+        host_cores = $form.find("input[name='host_cores']").val(),
+        host_ram = $form.find("input[name='host_ram']").val(),
+        host_space = $form.find("input[name='host_space']").val();
+
+    console.log(host_cores);
+
+    host_cores = parseInt(host_cores);
+    host_ram = parseInt(host_ram);
+    host_space = parseInt(host_space);
+
+    api.create('host', {
+        name: host_name,
+        ncpu: host_cores,
+        nram: host_ram,
+        nhdd: host_space
+    }).then(res => console.log(res))
+        .catch((reason) => console.log(reason));
+});
+
+$('#nfsNewForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        nfs_path = $form.find("input[name='nfs_path']").val(),
+        nfs_mapping = $form.find("input[name='nfs_mapping']").val(),
+        nfs_group = $form.find("select[name='nfs_group']").val();
+
+    nfs_group = parseInt(nfs_group);
+
+    api.create('nfs', {
+        path: nfs_path,
+        mapping: nfs_mapping,
+        'group': {
+            'id': nfs_group,
+            'type': 'groups'
+        }
+    }).then(res => console.log(res))
+        .catch((reason) => console.log(reason));
+});
+</script>
+{% endif %}
+
+<h2>Hosts</h2>
+
+<table>
+    <tr><th>ID</th><th>Name</th><th>Cores</th><th>RAM (GB)</th><th>Space (TB)</th></tr>
+{% for host in content.hosts %}
+<tr><td>{{ host.id }}</td><td>{{ host.name }}</td><td>{{ host.ncpu }}</td><td>{{ host.nram }}</td><td>{{ host.nhdd }}</td></tr>
+{% endfor %}
+</table>
+
+<h2>NFS Mappings</h2>
+
+<table>
+    <tr><th>ID</th><th>Group</th><th>Path</th><th>Mapping</th></tr>
+{% for nfs in content.nfs %}
+<tr><td>{{ nfs.id }}</td><td>{{ nfs.group.name }}</td><td>{{ nfs.path }}</td><td>{{ nfs.mapping }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

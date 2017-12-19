@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Hello{% endblock %}
+{% block login %}
+{% if logged_in %}
+Welcome, {{name}}. <a href="/logout">Log out</a>
+{% else %}
+<form action="/login" method="POST">
+{% if login_failed %}
+<div class="login_warn">Login failed!</div>
+{% endif %}
+<table>
+    <tr><td>Username</td><td><input name="username" /></td></tr>
+    <tr><td>Password</td><td><input type="password" name="password" /></td></tr>
+    <tr><td></td><td><input type="submit" value="Log In" /></td></tr>
+</table>
+{% endif %}
+{% endblock %}
+{% block content %}
+{% if content %}
+{{content}}
+{% elif links %}
+<p1>Welcome to RBG LXC Compute Cluster</p2>
+<div>
+	Check out these links available to you:
+	<li>
+{% for name, tgt in links %}
+	<ul><a href="{{ tgt }}">{{ name }}</a></ul>
+{% endfor %}
+	</li>
+
+</div>
+{% else %}
+{% endif %}
+{% endblock %}
