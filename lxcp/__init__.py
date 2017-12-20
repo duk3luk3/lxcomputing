@@ -42,9 +42,8 @@ def lib_render(lib_response):
 def process_api_request(sender, method, endpoint, data, req_args):
     authorization = data.get('headers', {}).get('Authorization')
     if authorization:
-        name, secret = 
-
-
+        lib = Lib.get_lib()
+        lib.session.node_auth(authorization)
 
 @app.route('/static/<fname>')
 def static_file(fname):

@@ -11,7 +11,8 @@ from .auth import StrukAuth
 
 @event.listens_for(Container, 'after_insert')
 def container_insert(mapper, connection, container):
-    redis_store.rpush('events.container.insert', container.id)
+    host = container.host
+    redis_store.rpush('events.{}.container.insert'.format(host), container.id)
 
     print(container)
 
