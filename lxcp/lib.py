@@ -5,7 +5,7 @@ import sys
 from flask import g, session
 from sqlalchemy import event
 
-from . import db, redis_store
+from . import db, redis_store, api
 from .model import *
 from .auth import StrukAuth
 
@@ -82,7 +82,6 @@ class Lib:
         lib = getattr(g, '_lib', None)
         if lib is None:
             sess = Session(session)
-            db = Lib.get_db()
             lib = g._lib = Lib(sess)
         return lib
 
@@ -169,6 +168,16 @@ class Session:
     def logged_in(self):
         return 'username' in self.session
 
+    def node_authed(self):
+        return 'nodename' in self.session
+
+    def node(self):
+        node = self.session.get('node', None)
+        if node:
+            node_obj = Host.query.get(node)
+            return node_obj
+        return node
+
     def username(self):
         return self.session.get('username', None)
 
@@ -178,6 +187,15 @@ class Session:
             user_obj = User.query.filter(User.id == user).one()
             return user_obj
         return user
+
+    def node_auth(self, auth_string):
+        node, secret = auth_string.split(':', maxsplits=1)
+        r_secret = redis_store.get('node_secret')
+        if secret == r_secret:
+            self.session['nodename'] = node
+            dbn = Host.query.filter(Host.name == node).one_or_none
+            if dbn:
+                self.session['node'] = dbn.id
 
     def password_auth(self, username, password):
         if StrukAuth.test(username, password):

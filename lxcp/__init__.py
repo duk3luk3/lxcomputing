@@ -38,6 +38,14 @@ def lib_render(lib_response):
         '{status} {reason}'.format(**lib_response)
         )
 
+@api.on_request.connect
+def process_api_request(sender, method, endpoint, data, req_args):
+    authorization = data.get('headers', {}).get('Authorization')
+    if authorization:
+        name, secret = 
+
+
+
 @app.route('/static/<fname>')
 def static_file(fname):
     return send_from_directory('static', fname)

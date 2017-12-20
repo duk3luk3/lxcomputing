@@ -18,6 +18,7 @@ class Serializable:
     @permission_test(Permissions.VIEW)
     def can_view(self):
         # late import to avoid circular reference
+        print('Checked can_view: {}'.format(self))
         from .lib import Lib
         sess = Lib.get_lib().session
         user = sess.user()
@@ -25,7 +26,26 @@ class Serializable:
 
     @permission_test(Permissions.EDIT)
     def can_edit(self):
+        print('Checked can_edit: {}'.format(self))
         # late import to avoid circular reference
+        from .lib import Lib
+        sess = Lib.get_lib().session
+        user = sess.user()
+        return self.is_writeable_for(user)
+
+    @permission_test(Permissions.CREATE)
+    def can_create(self):
+        print('Checked can_create: {}'.format(self))
+        # late import to avoid circular reference
+        from .lib import Lib
+        sess = Lib.get_lib().session
+        user = sess.user()
+        return self.is_writeable_for(user)
+
+    @permission_test(Permissions.DELETE)
+    def can_delete(self):
+        print('Checked can_delete: {}'.format(self))
+        return True
         from .lib import Lib
         sess = Lib.get_lib().session
         user = sess.user()
