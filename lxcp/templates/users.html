@@ -27,16 +27,6 @@
 	</table>
 </form>
 <script>
-const Kitsu = require('kitsu');
-
-const api = new Kitsu({
-    baseURL: 'http://localhost:5000/api',
-    headers: {
-        Authorization: 'foobar'
-    }
-
-});
-
 $(function() {
     api.get('users').then(res => console.log(res));
 });

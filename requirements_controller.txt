@@ -1,0 +1,5 @@
+flask
+flask_sqlalchemy
+sqlalchemy_jsonapi
+flask_redis
+blinker

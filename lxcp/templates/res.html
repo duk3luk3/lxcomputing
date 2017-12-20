@@ -30,16 +30,6 @@
 	</table>
 </form>
 <script>
-const Kitsu = require('kitsu');
-
-const api = new Kitsu({
-    baseURL: 'http://localhost:5000/api',
-    headers: {
-        Authorization: 'foobar'
-    }
-
-});
-
 $('#hostNewForm').submit(function(event) {
     event.preventDefault();
     var $form = $( this ),
