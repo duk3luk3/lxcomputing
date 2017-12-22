@@ -41,7 +41,10 @@ def lib_render(lib_response):
 @api.on_request.connect
 def process_api_request(sender, method, endpoint, data, req_args):
     authorization = data.get('headers', {}).get('Authorization')
-    if authorization:
+    if not authorization:
+        authorization = request.headers.get('Authorization')
+    print('Auth:', authorization)
+    if authorization and authorization != 'foobar':
         lib = Lib.get_lib()
         lib.session.node_auth(authorization)
 

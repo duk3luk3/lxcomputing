@@ -190,13 +190,18 @@ class Session:
         return user
 
     def node_auth(self, auth_string):
-        node, secret = auth_string.split(':', maxsplits=1)
+        node, secret = auth_string.split(':', maxsplit=1)
         r_secret = redis_store.get('node_secret')
+        if r_secret:
+            r_secret = r_secret.decode()
         if secret == r_secret:
+            print('node authed')
             self.session['nodename'] = node
-            dbn = Host.query.filter(Host.name == node).one_or_none
+            dbn = Host.query.filter(Host.name == node).one_or_none()
             if dbn:
                 self.session['node'] = dbn.id
+        else:
+            print('node auth FAIL')
 
     def password_auth(self, username, password):
         if StrukAuth.test(username, password):
