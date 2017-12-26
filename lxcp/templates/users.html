@@ -27,10 +27,6 @@
 	</table>
 </form>
 <script>
-$(function() {
-    api.get('users').then(res => console.log(res));
-});
-
 $('#groupNewForm').submit(function(event) {
     event.preventDefault();
     var $form = $( this ),
@@ -62,8 +58,17 @@ $('#userNewForm').submit(function(event) {
             'id': user_group,
             'type': 'groups'
         }
-    }).then(res => console.log(res))
-        .catch((reason) => console.log(reason));
+    }).then(function(res) {
+        console.log(res);
+        var table_id = '#group' + user_group + 'usersTable';
+        console.log(table_id);
+        var table = $(table_id);
+
+        console.log(table);
+
+        table.append('<tr><td>' + res['data']['id'] + '</td><td>' + res['data']['attributes']['username'] + '</td><td>' + res['data']['attributes']['is-admin'] + '</td></tr>'  );
+
+    }).catch((reason) => console.log(reason));
 
 });
 
@@ -90,7 +95,9 @@ function userDelete(event) {
     if (confirm('Really delete User #' + user_id + ' (' + user_name + ')?' )) {
 
         api.remove('user', user_id).then(function(res) {
-            $('#user'+user_id+'Div').remove();
+            $('#user'+user_id+'Row').fadeOut(600, function(){
+                $('#user'+user_id+'Row').remove();
+            });
         })
             .catch((reason) => console.log(reason));
     }
@@ -120,10 +127,10 @@ $('#group{{group.id}}DeleteForm').submit(groupDelete);
 <strong>Users</strong>
 
 
-<table>
-<tr><th>ID</th><th>Name</th><th>uidNumber</th><th>is_admin</th></tr>
+<table id="group{{group.id}}usersTable">
+<tr><th>ID</th><th>Name</th><th>is_admin</th></tr>
 {% for user in group.group_members %}
-<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.uidNumber}}</td><td>{{ user.is_admin }}</td>
+<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.is_admin }}</td>
 {% if user.is_writeable_for(session_data.user) %}
 <td>
 <form id="user{{user.id}}DeleteForm">

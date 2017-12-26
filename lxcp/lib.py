@@ -8,13 +8,19 @@ from sqlalchemy import event
 from . import db, redis_store, api
 from .model import *
 from .auth import StrukAuth
+from . import lxd
 
 @event.listens_for(Container, 'after_insert')
 def container_insert(mapper, connection, container):
     host = container.host
-    redis_store.rpush('events.{}.container.insert'.format(host), container.id)
+    client = lxd.LXClient()
+    client.cont_create(host, container.name)
 
-    print(container)
+@event.listens_for(Container, 'after_delete')
+def container_delete(mapper, connection, container):
+    host = container.host
+    client = lxd.LXClient()
+    client.cont_delete(host, container.name)
 
 class Data:
     DBFILE = '/srv/lxcompute/lxcompute.sqlite3'
@@ -88,6 +94,7 @@ class Lib:
 
     def __init__(self, session):
         self.session = session
+        self.lxclient = lxd.LXClient()
 
     def _ok(self, content):
         session_data = {

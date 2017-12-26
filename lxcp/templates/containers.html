@@ -2,6 +2,41 @@
 {% block title %}Container Management{% endblock %}
 {% block content %}
 <h2>Containers and Scheduling</h2>
+<script>
+function containerDelete(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        container_id = $form.find("input[name='container_id']").val(),
+        container_name = $form.find("input[name='container_name']").val();
+
+    if (confirm('Really delete Container #' + container_id + ' (' + container_name + ')?' )) {
+
+        api.remove('container', container_id).then(function(res) {
+            $('#container'+container_id+'Row').fadeOut(600, function(){
+                $('#container'+container_id+'Row').remove();
+            });
+        })
+            .catch((reason) => console.log(reason));
+    }
+}
+function containerSet(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        container_id = $form.find("input[name='container_id']").val(),
+        container_action = $form.find("input[name='container_action']").val();
+
+    if (confirm('Really ' + container_action + ' Container #' + container_id + '?' )) {
+
+        api.update('containers', {
+            id: container_id,
+            status: container_action
+        }).then(function(res) {
+            console.log(res);
+        })
+            .catch((reason) => console.log(reason));
+    }
+}
+</script>
 
 <strong>Create new Container</strong>
 <form action="/" id="containerNewForm">
@@ -51,5 +86,37 @@ $('#containerNewForm').submit(function(event) {
 });
 
 </script>
-{% endblock %}
 
+<h3>Containers</h3>
+<table>
+    <tr><th>Name</th><th>Host</th><th>Status</th></tr>
+{% for c in content.containers %}
+<tr id="container{{c.id}}Row"><td>{{c.name}}</td><td>{{c.host.name}}</td><td>{{c.lxc().status}}</td>
+{% if c.is_writeable_for(session_data.user) %}
+<td>
+<form id="container{{c.id}}DeleteForm">
+<input name="container_id" hidden="true" value="{{c.id}}">
+<input name="container_name" hidden="true" value="{{c.name}}">
+<input type="submit" value="Delete Container">
+</form>
+</td>
+<script>
+$('#container{{c.id}}DeleteForm').submit(containerDelete);
+</script>
+<td>
+{% for action in ["start", "stop", "restart", "freeze", "unfreeze"] %}
+<form id="container{{c.id}}{{action}}Form">
+<input name="container_id" hidden="true" value="{{c.id}}">
+<input name="container_action" hidden="true" value="{{action}}">
+<input type="submit" value="{{action}} Container">
+</form>
+<script>
+$('#container{{c.id}}{{action}}Form').submit(containerSet);
+</script>
+{% endfor %}
+</td>
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+{% endblock %}

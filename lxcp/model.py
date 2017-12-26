@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, event
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_jsonapi import permission_test, Permissions, relationship_descriptor, RelationshipActions
 from flask import g
 
@@ -221,6 +222,31 @@ class Container(DB_Base, Serializable):
             return True
         else:
             return False
+
+    def lxc(self):
+        from .lib import Lib
+        lib = Lib.get_lib()
+        return lib.lxclient.cont_get(self.host, self.name)
+
+    @hybrid_property
+    def status(self):
+        return self.lxc().status
+
+    @status.setter
+    def set_status(self, status):
+        container = self.lxc()
+        actions = {
+                'stop': container.stop,
+                'start': container.start,
+                'restart': container.restart,
+                'freeze': container.freeze,
+                'unfreeze': container.unfreeze
+        }
+        action = actions.get(status)
+        if action:
+            action()
+        else:
+            raise ValueError('Available status values: {}'.format(', '.join(actions.keys())))
 
 class Slot(DB_Base, Serializable):
     __tablename__ = 'slot'

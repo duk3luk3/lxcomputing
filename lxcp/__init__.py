@@ -38,15 +38,15 @@ def lib_render(lib_response):
         '{status} {reason}'.format(**lib_response)
         )
 
-@api.on_request.connect
-def process_api_request(sender, method, endpoint, data, req_args):
-    authorization = data.get('headers', {}).get('Authorization')
-    if not authorization:
-        authorization = request.headers.get('Authorization')
-    print('Auth:', authorization)
-    if authorization and authorization != 'foobar':
-        lib = Lib.get_lib()
-        lib.session.node_auth(authorization)
+#@api.on_request.connect
+#def process_api_request(sender, method, endpoint, data, req_args):
+#    authorization = data.get('headers', {}).get('Authorization')
+#    if not authorization:
+#        authorization = request.headers.get('Authorization')
+#    print('Auth:', authorization)
+#    if authorization and authorization != 'foobar':
+#        lib = Lib.get_lib()
+#        lib.session.node_auth(authorization)
 
 @app.route('/static/<fname>')
 def static_file(fname):
