@@ -40,6 +40,7 @@ function containerSet(event) {
 
 <strong>Create new Container</strong>
 <form action="/" id="containerNewForm">
+    <input type="hidden" name="container_creator" value="{{ session_data.user.id }}">
 	<table>
 		<tr><th>Name:</th><td><input name="container_name"></td></tr>
 		<tr><th>Host:</th><td>
@@ -49,8 +50,8 @@ function containerSet(event) {
                             {% endfor %}
                         </select>
                 </td></tr>
-		<tr><th>User:</th><td>
-                        <select name="container_user">
+		<tr><th>Users:</th><td>
+                        <select multiple name="container_users">
                             {% for user in session_data.user.group.group_members %}
                             <option value="{{user.id}}">{{user.username}}</option>
                             {% endfor %}
@@ -65,23 +66,44 @@ $('#containerNewForm').submit(function(event) {
     var $form = $( this ),
         container_name = $form.find("input[name='container_name']").val(),
         container_host = $form.find("select[name='container_host']").val(),
-        container_user = $form.find("select[name='container_user']").val(),
+        container_creator = $form.find("input[name='container_creator']").val(),
+        container_users = $form.find("select[name='container_users']").val();
 
     container_host = parseInt(container_host);
-    container_user = parseInt(container_user);
+    container_creator = parseInt(container_creator);
+    container_users = container_users.map(x => parseInt(x));
+
+//    container_users = container_users.map(x => ({
+//        id: x,
+//        type: 'users'
+//    }));
 
     api.create('container', {
         name: container_name,
-        'user': {
-            'id': container_user,
+        'creator': {
+            'id': container_creator,
             'type': 'users'
         },
         'host': {
             'id': container_host,
             'type': 'hosts'
         },
-    }).then(res => console.log(res))
-        .catch((reason) => console.log(reason));
+    }).then(res => {
+        console.log(res);
+
+        var new_id = res['data']['id'];
+
+        container_users.forEach((itm, idx) => {
+            api.update('containers', {
+                id: new_id,
+                user: {
+                    id: itm,
+                    type: "users"
+                }
+            }).then((res) => console.log(res))
+            .catch((reason) => console.log(reason));
+        });
+    }).catch((reason) => console.log(reason));
 
 });
 

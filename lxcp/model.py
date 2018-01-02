@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, event
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, event, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -85,14 +85,23 @@ class Group(DB_Base, Serializable):
         else:
             return False
 
+ContainerUsers = Table('container_user', DB_Base.metadata,
+        Column('container_id', Integer, ForeignKey('container.cid')),
+        Column('user_id', Integer, ForeignKey('user.uid'))
+        )
+
 class User(DB_Base, Serializable):
     __tablename__ = 'user'
     id = Column('uid', Integer, primary_key=True)
     group_id = Column(Integer, ForeignKey('group.gid'))
     group = relationship("Group", back_populates='group_members')
-    containers = relationship("Container", back_populates="user")
+    containers = relationship("Container",
+            secondary=ContainerUsers,
+            back_populates="users")
+    created_containers = relationship("Container", back_populates='creator')
     username = Column(String)
     is_admin = Column(Boolean)
+    sshkey = Column(String)
 
     def __init__(self, group=None, username=None, is_admin=None):
         self.group = group
@@ -192,23 +201,29 @@ class Container(DB_Base, Serializable):
     __tablename__ = 'container'
     id = Column('cid', Integer, primary_key=True)
     host_id = Column(Integer, ForeignKey('host.hid'))
-    user_id = Column(Integer, ForeignKey('user.uid'))
+    creator_id = Column(Integer, ForeignKey('user.uid'))
     host = relationship("Host", back_populates="containers")
-    user = relationship("User", back_populates="containers")
+    creator = relationship("User", back_populates="created_containers")
     slots = relationship("Slot", backref="container")
+    users = relationship("User",
+            secondary=ContainerUsers,
+            back_populates="containers")
     name = Column(String)
 
-    def __init__(self, host=None, user=None, name=None):
+    def __init__(self, host=None, owner=None, name=None):
         self.host = host
-        self.user = user
+        self.owner = owner
         self.name = name
+
+    def __repr__(self):
+        return '<Container {}>'.format(repr(self.name))
 
     def is_visible_for(self, user):
         if not user:
             return False
         if user.is_super_admin:
             return True
-        elif user.group == self.group:
+        elif user.group == self.owner.group:
             return True
         else:
             return False
@@ -218,7 +233,7 @@ class Container(DB_Base, Serializable):
             return False
         if user.is_super_admin:
             return True
-        elif user.is_admin and user.group == self.group:
+        elif user.is_admin and user == self.owner:
             return True
         else:
             return False

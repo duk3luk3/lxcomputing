@@ -93,11 +93,30 @@ function userDelete(event) {
         user_name = $form.find("input[name='user_name']").val();
 
     if (confirm('Really delete User #' + user_id + ' (' + user_name + ')?' )) {
-
         api.remove('user', user_id).then(function(res) {
             $('#user'+user_id+'Row').fadeOut(600, function(){
                 $('#user'+user_id+'Row').remove();
             });
+        })
+            .catch((reason) => console.log(reason));
+    }
+}
+function userSetKey(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        user_id = $form.find("input[name='user_id']").val(),
+        user_name = $form.find("input[name='user_name']").val();
+
+    var key = prompt('Paste new SSH Key(s) for ' + user_name, '');
+
+    if (key != null) {
+        api.update('user', {
+            id: user_id,
+            sshkey: key
+        }).then(function(res) {
+//            $('#user'+user_id+'Row').fadeOut(600, function(){
+//                $('#user'+user_id+'Row').remove();
+//            });
         })
             .catch((reason) => console.log(reason));
     }
@@ -128,9 +147,9 @@ $('#group{{group.id}}DeleteForm').submit(groupDelete);
 
 
 <table id="group{{group.id}}usersTable">
-<tr><th>ID</th><th>Name</th><th>is_admin</th></tr>
+<tr><th>ID</th><th>Name</th><th>is_admin</th><th>SSH Key</th></tr>
 {% for user in group.group_members %}
-<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.is_admin }}</td>
+<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.is_admin }}</td><td><abbr title="{{user.sshkey}}">{{ user.sshkey.split(' ')|map('truncate', 32)|join(' ') }}</abbr></td>
 {% if user.is_writeable_for(session_data.user) %}
 <td>
 <form id="user{{user.id}}DeleteForm">
@@ -141,6 +160,16 @@ $('#group{{group.id}}DeleteForm').submit(groupDelete);
 </td>
 <script>
 $('#user{{user.id}}DeleteForm').submit(userDelete);
+</script>
+<td>
+<form id="user{{user.id}}KeyForm">
+<input name="user_id" hidden="true" value="{{user.id}}">
+<input name="user_name" hidden="true" value="{{user.username}}">
+<input type="submit" value="Set SSH Key">
+</form>
+</td>
+<script>
+$('#user{{user.id}}KeyForm').submit(userSetKey);
 </script>
 {% endif %}
 </tr>

@@ -23,7 +23,10 @@ class StrukAuth:
                 'uid': user.uid,
                 'org': str(user.org.UQN),
                 'uidNumber': user.uidNumber,
-                'isRootUser': Group['fmi', 'rbg'] in user.backreferences['group.member']
+                'isRootUser': Group['fmi', 'rbg'] in user.backreferences['group.member'],
+                'password': user.password,
+                'sn': user.sn,
+                'givenName': user.givenName
             }
         else:
             return None

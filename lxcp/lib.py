@@ -22,6 +22,18 @@ def container_delete(mapper, connection, container):
     client = lxd.LXClient()
     client.cont_delete(host, container.name)
 
+@event.listens_for(Container.users, 'append')
+def container_user_append(container, user, initiator):
+    client = lxd.LXClient()
+    host = container.host
+    client.cont_adduser(host, container, user)
+
+@event.listens_for(Container.users, 'remove')
+def container_user_append(container, user, initiator):
+    client = lxd.LXClient()
+    host = container.host
+    client.cont_deluser(host, container, user)
+
 class Data:
     DBFILE = '/srv/lxcompute/lxcompute.sqlite3'
     SCHEMADIR = 'db_schema'

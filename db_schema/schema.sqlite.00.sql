@@ -9,9 +9,10 @@ CREATE TABLE 'group' (
 
 CREATE TABLE 'user' (
 	uid INTEGER PRIMARY KEY ASC,
-	username TEXT UNIQE,				--   username (uid)
+	username TEXT UNIQUE,				--   username (uid)
 	group_id INTEGER,
 	is_admin INTEGER,
+	sshkey TEXT,
 	FOREIGN KEY(group_id) REFERENCES 'group'(gid)
 );
 
@@ -33,11 +34,18 @@ CREATE TABLE 'nfs' (
 
 CREATE TABLE 'container' (
 	cid INTEGER PRIMARY KEY ASC,
-	name TEXT,
+	name TEXT UNIQUE,
 	host_id INTEGER,
-	user_id INTEGER,
-	FOREIGN KEY(user_id) REFERENCES user(uid),
+	creator_id INTEGER,
+	FOREIGN KEY(creator_id) REFERENCES user(uid),
 	FOREIGN KEY(host_id) REFERENCES host(hid)
+);
+
+CREATE TABLE 'container_user' (
+	container_id INTEGER,
+	user_id INTEGER,
+	FOREIGN KEY(container_id) REFERENCES container(cid),
+	FOREIGN KEY(user_id) REFERENCES user(uid)
 );
 
 CREATE TABLE 'slot' (
