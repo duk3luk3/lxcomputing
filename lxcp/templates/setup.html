@@ -7,13 +7,44 @@
 	{% if populated %}
 	DB is populated. Delete DB if you want to start over.
 	{% else %}
-	Enter username and password for superuser.
-	<form method="post" action="/setup/db_populate">
+        <form method="post" action="{{url_for('db_populate')}}">
 
 		<input type="submit" value="Populate DB" />
 	</table>
 	</form>
 	{% endif %}
 
+</div>
+<h2>Container Templates</h2>
+<div>
+    Select a running container to provision as new template (<a href="{{url_for('if_containers')}}">Or create one first</a>)
+    <form method="post" action="{{url_for('container_provision')}}">
+    <table>
+        <tr>
+            <th>Container</th>
+            <td>
+                <select name="container_id">
+                    {% for c in content.containers %}
+                    {% if c.creator.is_super_admin and c.status == 'Running' %}
+                    <option value="{{c.id}}">{{c.name }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><input type="Submit" value="Provision">
+        </tr>
+    </table>
+    </form>
+    Existing Templates:
+    <table>
+        <tr><th>Name</th><th>Description</th><th>Date provisioned</th></tr>
+        {% for image in images %}
+        {% if image.aliases|count > 0 and image.aliases[0]['name'].startswith('lxtemplate') %}
+        <tr><td>{{images.aliases[0]['name']}}</td><td>{{image.properties['description']}}</td><td>
+        {% endif %}
+        {% endfor %}
+    </table>
 </div>
 {% endblock %}

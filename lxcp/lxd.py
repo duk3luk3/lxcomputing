@@ -1,5 +1,7 @@
 import pylxd
 
+from pathlib import Path
+
 from .auth import StrukAuth
 
 class LXClient:
@@ -10,8 +12,12 @@ class LXClient:
                 verify=False
                 )
 
-    def cont_create(self, host, name):
-        config = {'name': name, 'source': {'type': 'image', 'alias': 'xenial'}}
+    def cont_create(self, host, name, image):
+        if image:
+            source = {'type': 'image', 'fingerprint': image}
+        else:
+            source = {'type': 'image', 'alias': 'xenial'}
+        config = {'name': name, 'source': source}
         container = self.client.containers.create(config, wait=False)
         return container
 
@@ -22,6 +28,27 @@ class LXClient:
     def cont_delete(self, host, name):
         container = self.client.containers.get(name)
         container.delete()
+
+    def cont_provision(self, host, container):
+        """Provision a container for use as a template"""
+        cont = self.cont_get(host, container.name)
+        if cont.status != 'RUNNING':
+            cont.start()
+        p = Path(__file__).parent / 'files' / 'provision.sh'
+        with p.open() as f:
+            script = f.read()
+        cont.files.put('/root/provision.sh', script)
+        cmd = ['chmod', '+x', '/root/provision.sh']
+        res = cont.execute(cmd)
+        print(res)
+        cmd = ['/bin/bash', '-x', '-c', '/root/provision.sh']
+        res = cont.execute(cmd)
+        print(res)
+
+
+    def cont_init(self, host, container):
+        """Initialize a new container"""
+        pass
 
     def cont_adduser(self, host, container, user):
         cnt = self.cont_get(host, container.name)
@@ -58,3 +85,7 @@ class LXClient:
         del_cmd = ['deluser', uname]
         res = cnt.execute(del_cmd)
         print('res', res)
+
+    def images(self, host):
+        return self.client.images.all()
+

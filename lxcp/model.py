@@ -209,6 +209,7 @@ class Container(DB_Base, Serializable):
             secondary=ContainerUsers,
             back_populates="containers")
     name = Column(String)
+    image = Column(String)
 
     def __init__(self, host=None, owner=None, name=None):
         self.host = host

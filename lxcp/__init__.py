@@ -113,7 +113,14 @@ def logout():
 def setup():
     db = Lib.get_db()
 
-    return render_template('setup.html', populated=db.is_db_populated())
+    lib = Lib.get_lib()
+
+    client = lib.lxclient
+
+    images = client.images(None)
+    response = lib.data(classes=({'hosts':Host, 'containers':Container}))
+
+    return render_template('setup.html', populated=db.is_db_populated(), images=images, **response)
 
 @app.route('/setup/db_populate', methods=['POST'])
 def db_populate():
@@ -127,6 +134,14 @@ def db_populate():
         return 'Error'
     else:
         return redirect('/setup')
+
+@app.route('/setup/container_provision', methods=['POST'])
+def container_provision():
+    lib = Lib.get_lib()
+    container_id = int(request.form['container_id'])
+    lib.container_provision(container_id)
+    return redirect('/setup')
+
 
 @app.route('/data/')
 def show_data():
@@ -150,7 +165,9 @@ def if_res():
 def if_containers():
     lib = Lib.get_lib()
     response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group}))
-    return render_template('containers.html', **response)
+    client = lib.lxclient
+    images = client.images(None)
+    return render_template('containers.html', images=images, **response)
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 

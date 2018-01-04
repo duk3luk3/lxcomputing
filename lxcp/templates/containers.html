@@ -42,6 +42,13 @@ function containerSet(event) {
 <form action="/" id="containerNewForm">
     <input type="hidden" name="container_creator" value="{{ session_data.user.id }}">
 	<table>
+{% if session_data.user.is_super_admin %}
+<tr><th>Image:</th><td><select name="container_image">
+            {% for image in images %}
+            <option value="{{image.fingerprint}}">{{image.aliases[0]['name'] if image.aliases|count > 0 else image.properties['description'] }}</option>
+            {% endfor %}
+        </select></td>
+{% endif %}
 		<tr><th>Name:</th><td><input name="container_name"></td></tr>
 		<tr><th>Host:</th><td>
                         <select name="container_host">
@@ -64,6 +71,7 @@ function containerSet(event) {
 $('#containerNewForm').submit(function(event) {
     event.preventDefault();
     var $form = $( this ),
+        container_image = $form.find("select[name='container_image']").val(),
         container_name = $form.find("input[name='container_name']").val(),
         container_host = $form.find("select[name='container_host']").val(),
         container_creator = $form.find("input[name='container_creator']").val(),
@@ -78,7 +86,7 @@ $('#containerNewForm').submit(function(event) {
 //        type: 'users'
 //    }));
 
-    api.create('container', {
+    var data = {
         name: container_name,
         'creator': {
             'id': container_creator,
@@ -87,8 +95,16 @@ $('#containerNewForm').submit(function(event) {
         'host': {
             'id': container_host,
             'type': 'hosts'
-        },
-    }).then(res => {
+        }
+    };
+
+    if (container_image != null) {
+        data['image'] = container_image;
+    }
+
+    api.create(
+        'container', data
+    ).then(res => {
         console.log(res);
 
         var new_id = res['data']['id'];

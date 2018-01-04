@@ -37,6 +37,7 @@ CREATE TABLE 'container' (
 	name TEXT UNIQUE,
 	host_id INTEGER,
 	creator_id INTEGER,
+	image TEXT,
 	FOREIGN KEY(creator_id) REFERENCES user(uid),
 	FOREIGN KEY(host_id) REFERENCES host(hid)
 );

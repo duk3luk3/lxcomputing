@@ -14,7 +14,7 @@ from . import lxd
 def container_insert(mapper, connection, container):
     host = container.host
     client = lxd.LXClient()
-    client.cont_create(host, container.name)
+    client.cont_create(host, container.name, container.image)
 
 @event.listens_for(Container, 'after_delete')
 def container_delete(mapper, connection, container):
@@ -179,6 +179,12 @@ class Lib:
 
     def data_get(self, cls, id_):
         return self._ok(cls.query.get(id_))
+
+    def container_provision(self, container_id):
+
+        client = self.lxclient
+        container = Container.query.get(container_id)
+        client.cont_provision('', container)
 
 
 class Session:
