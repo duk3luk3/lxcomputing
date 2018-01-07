@@ -42,7 +42,7 @@
         <tr><th>Name</th><th>Description</th><th>Date provisioned</th></tr>
         {% for image in images %}
         {% if image.aliases|count > 0 and image.aliases[0]['name'].startswith('lxtemplate') %}
-        <tr><td>{{images.aliases[0]['name']}}</td><td>{{image.properties['description']}}</td><td>
+        <tr><td>{{image.aliases[0]['name']}}</td><td>{{image.properties['description']}}</td><td>
         {% endif %}
         {% endfor %}
     </table>

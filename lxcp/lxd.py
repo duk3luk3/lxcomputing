@@ -1,4 +1,5 @@
 import pylxd
+from pylxd.models.image import _image_create_from_config
 
 from pathlib import Path
 
@@ -30,7 +31,12 @@ class LXClient:
         container.delete()
 
     def cont_provision(self, host, container):
-        """Provision a container for use as a template"""
+        """Provision a container for use as a template
+
+        * Starts the container if not running
+        * Uploads and executes provisioning script
+        * Converts container to template
+        """
         cont = self.cont_get(host, container.name)
         if cont.status != 'RUNNING':
             cont.start()
@@ -44,6 +50,23 @@ class LXClient:
         cmd = ['/bin/bash', '-x', '-c', '/root/provision.sh']
         res = cont.execute(cmd)
         print(res)
+        cmd = ['poweroff']
+        res = cont.execute(cmd)
+        print(res)
+        cont.stop()
+        image_config = {
+                'aliases': [
+                    {
+                        'name': 'lxtemplate-' + container.name,
+                        'description': 'New LXC Template'
+                    }
+                    ],
+                'source': {
+                    'type': 'container',
+                    'name': container.name
+                    }
+                }
+        _image_create_from_config(self.client, image_config, wait=True)
 
 
     def cont_init(self, host, container):

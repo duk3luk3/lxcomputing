@@ -2,6 +2,8 @@
 
 set -eu
 
+set -x
+
 # Probably not really needed, but we set it anyway
 export http_proxy="http://proxy.in.tum.de:8080"
 export https_proxy="http://proxy.in.tum.de:8080"
