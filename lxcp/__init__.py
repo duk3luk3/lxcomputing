@@ -1,11 +1,34 @@
 #! python
 
-from flask import Flask, g, jsonify, abort, redirect, url_for, make_response, render_template, request, session, send_from_directory
+from flask import Flask, g, jsonify, abort, redirect, url_for, make_response, render_template, request, session, send_from_directory, current_app
 from flask.json import JSONEncoder
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_jsonapi import FlaskJSONAPI
 from flask_redis import FlaskRedis
+from flask_apscheduler import APScheduler
 import os
+import sys
+
+
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+#        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'stream': sys.stderr,
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 
 app = Flask(__name__)
 DBFILE = os.environ.get('DBFILE', '/srv/lxcompute/lxcompute.sqlite3')
@@ -15,10 +38,67 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SERVER_NAME'] = os.environ.get('FLASK_SERVER_NAME', 'localhost:5000')
+app.config['SCHEDULER_JOBS'] = [
+        {
+            'id': 'cont_schedule',
+            'func': 'lxcp.schedule:cont_schedule',
+            'trigger': 'interval',
+            'minutes': 2
+        }
+]
+app.config['LXCP_INSTANCES'] = [
+        {
+            'name': 'balanced.micro',
+            'cpu': 2,
+            'ram': 2
+        },
+        {
+            'name': 'balanced.std',
+            'cpu': 8,
+            'ram': 8
+        },
+        {
+            'name': 'balanced.big',
+            'cpu': 16,
+            'ram': 16
+        },
+        {
+            'name': 'balanced.max',
+            'cpu': 32,
+            'ram': 32
+        },
+        {
+            'name': 'mem.std',
+            'cpu': 8,
+            'ram': 16
+        },
+        {
+            'name': 'mem.big',
+            'cpu': 16,
+            'ram': 32
+        },
+        {
+            'name': 'mem.max',
+            'cpu': 32,
+            'ram': 64
+        },
+        {
+            'name': 'cpu.micro',
+            'cpu': 8,
+            'ram': 4
+        },
+        {
+            'name': 'cpu.std',
+            'cpu': 16,
+            'ram': 8
+        }
+]
+#app.config['SCHEDULER_API_ENABLED'] = True
 db = SQLAlchemy(app)
 redis_store = FlaskRedis(app)
 from .model import *
 api = FlaskJSONAPI(app, db)
+scheduler = APScheduler(app=app)
 
 from lxcp.lib import Lib, Data, User, Session, StrukAuth
 
@@ -164,12 +244,14 @@ def if_res():
 @app.route('/containers/')
 def if_containers():
     lib = Lib.get_lib()
-    response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group}))
+    response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group, 'slots': Slot}))
     client = lib.lxclient
     images = client.images(None)
-    return render_template('containers.html', images=images, **response)
+    config = current_app.config
+    return render_template('containers.html', images=images, instances=config['LXCP_INSTANCES'], **response)
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    scheduler.start()
+    app.run(debug=True, use_reloader=False)

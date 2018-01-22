@@ -2,7 +2,7 @@ import glob
 import os
 import sys
 
-from flask import g, session
+from flask import g, session, current_app
 from sqlalchemy import event
 
 from . import db, redis_store, api

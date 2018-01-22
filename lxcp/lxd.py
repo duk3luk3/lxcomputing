@@ -54,6 +54,7 @@ class LXClient:
         res = cont.execute(cmd)
         print(res)
         cont.stop()
+        #TODO: Use container.publish (but then can't pass alias)
         image_config = {
                 'aliases': [
                     {

@@ -9,17 +9,19 @@
 </head>
 <body>
    <script src="/static/jquery-3.2.1.js"></script>
-   <script src="/static/bundle.js"></script>
+   <!--   <script src="/static/bundle.js"></script>-->
+   <!--<script src="/static/axios.js"></script>-->
+   <script src="/static/kitsu_dev.js"></script>
 {% block init_api %}
 <script>
-const Kitsu = require('kitsu');
+//const Kitsu = require('kitsu');
+const Kitsu = window.kitsu;
 
 const api = new Kitsu({
     baseURL: '{{config['PREFERRED_URL_SCHEME']}}://{{config['SERVER_NAME']}}/api',
     headers: {
         Authorization: 'foobar'
     }
-
 });
 </script>
 

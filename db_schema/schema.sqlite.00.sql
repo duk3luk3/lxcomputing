@@ -54,6 +54,7 @@ CREATE TABLE 'slot' (
 	container_id INTEGER,
 	host_id INTEGER,
 	hours INTEGER,
+	hours_used INTEGER,
 	ncpu INTEGER,
 	nram INTEGER,
 	FOREIGN KEY(container_id) REFERENCES container(cid)

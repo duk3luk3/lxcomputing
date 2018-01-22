@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_jsonapi import permission_test, Permissions, relationship_descriptor, RelationshipActions
-from flask import g
+from flask import g, current_app
 
 from collections import OrderedDict
 
@@ -15,6 +15,11 @@ DB_Base = db.Model
 class Serializable:
     def as_dict(self):
         return OrderedDict([(name, getattr(self, name)) for name, column in self.__mapper__.columns.items()])
+
+    def save(self):
+        if self.id == None:
+            db.session.add(self)
+        return db.session.commit()
 
     @permission_test(Permissions.VIEW)
     def can_view(self):
@@ -166,6 +171,17 @@ class Host(DB_Base, Serializable):
         else:
             return False
 
+    def calc_utilisation(self):
+        pending_slots = [slot for slot in self.slots if slot.hours > slot.hours_used]
+
+        cpu = sum(slot.ncpu for slot in pending_slots)
+        ram = sum(slot.nram for slot in pending_slots)
+
+        utilisation = max(cpu / self.ncpu, ram / self.nram)
+
+        return {'cpu_demand': cpu, 'ram_demand': ram, 'utilisation': utilisation}
+
+
 class NFS(DB_Base, Serializable):
     __tablename__ = 'nfs'
     id = Column('nid', Integer, primary_key=True)
@@ -246,10 +262,12 @@ class Container(DB_Base, Serializable):
 
     @hybrid_property
     def status(self):
-        return self.lxc().status
+        if not hasattr(self, '_status'):
+            self._status = self.lxc().status
+        return self._status
 
     @status.setter
-    def set_status(self, status):
+    def status(self, status):
         container = self.lxc()
         actions = {
                 'stop': container.stop,
@@ -261,8 +279,32 @@ class Container(DB_Base, Serializable):
         action = actions.get(status)
         if action:
             action()
+            if hasattr(self, '_status'):
+                delattr(self, '_status')
         else:
             raise ValueError('Available status values: {}'.format(', '.join(actions.keys())))
+
+    def actions(self):
+        status = self.status
+        actions = {
+                'Running': ['stop', 'freeze', 'restart'],
+                'Stopped': ['start'],
+                'Frozen': ['unfreeze', 'stop']
+                }
+        return actions[status]
+
+    def schedule(self):
+        """Start container if not started
+        """
+        if not self.status == 'Running':
+            self.status = 'start'
+
+    def unschedule(self):
+        """Stop container is running
+        """
+        if self.status == 'Running':
+            self.status = 'stop'
+
 
 class Slot(DB_Base, Serializable):
     __tablename__ = 'slot'
@@ -270,13 +312,35 @@ class Slot(DB_Base, Serializable):
     container_id = Column(Integer, ForeignKey('container.cid'))
     host_id = Column(Integer, ForeignKey('host.hid'))
     hours = Column(Integer)
+    hours_used = Column(Integer)
     ncpu = Column(Integer)
     nram = Column(Integer)
 
-    def __init__(self, container, hours, ncpu, nram):
+    def __init__(self, container=None, hours=None, hours_used=None, ncpu=None, nram=None):
         self.container = container
-        self.hours = hours
-        self.ncpu = ncpu
+        self.hours = hours or 0
+        self.hours_used = hours_used or 0
+        self.ncpu = ncpu or 0
+        self.nram = nram or 0
+
+    @hybrid_property
+    def instance(self):
+        return None
+
+    @instance.setter
+    def instance(self, value):
+        app = current_app
+        instances = app.config['LXCP_INSTANCES']
+        inst = None
+        for instance in instances:
+            if instance['name'] == value:
+                inst = instance
+                break
+        if inst:
+            self.ncpu = inst['cpu']
+            self.nram = inst['ram']
+        else:
+            raise KeyError('Cannot find instance {}'.format(value))
 
     def is_visible_for(self, user):
         if not user:
@@ -294,5 +358,9 @@ class Slot(DB_Base, Serializable):
             return True
         else:
             return False
+
+    def __repr__(self):
+        return '<Slot id={}: container={}, ncpu={}, nram={}, hours={}, hours_used={}>'.format(
+                repr(self.id), repr(self.container.name) if self.container else 'None', repr(self.ncpu), repr(self.nram), repr(self.hours), repr(self.hours_used))
 
 

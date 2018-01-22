@@ -32,6 +32,29 @@ function containerSet(event) {
             status: container_action
         }).then(function(res) {
             console.log(res);
+            const new_status = {
+                'start': 'Running',
+                'stop': 'Stopped',
+                'restart': 'Running',
+                'freeze': 'Frozen',
+                'unfreeze': 'Running'
+            };
+            $('#container' + container_id + '-status').text(new_status[container_action]);
+            const new_actions = {
+                'Running': ['stop', 'freeze', 'restart'],
+                'Stopped': ['start'],
+                'Frozen': ['unfreeze', 'stop']
+            }
+            Object.keys(new_status).forEach(itm => {
+                const sid = '#container' + container_id + itm + 'Submit';
+                if (new_actions[new_status[container_action]].includes(itm)) {
+                    console.log('Unhiding ' + sid)
+                    $(sid).show();
+                } else {
+                    console.log('Hiding ' + sid)
+                    $(sid).hide();
+                }
+            });
         })
             .catch((reason) => console.log(reason));
     }
@@ -81,10 +104,10 @@ $('#containerNewForm').submit(function(event) {
     container_creator = parseInt(container_creator);
     container_users = container_users.map(x => parseInt(x));
 
-//    container_users = container_users.map(x => ({
-//        id: x,
-//        type: 'users'
-//    }));
+    container_users = container_users.map(x => ({
+        id: x,
+        type: 'users'
+    }));
 
     var data = {
         name: container_name,
@@ -95,7 +118,8 @@ $('#containerNewForm').submit(function(event) {
         'host': {
             'id': container_host,
             'type': 'hosts'
-        }
+        },
+        'users': container_users
     };
 
     if (container_image != null) {
@@ -107,18 +131,18 @@ $('#containerNewForm').submit(function(event) {
     ).then(res => {
         console.log(res);
 
-        var new_id = res['data']['id'];
-
-        container_users.forEach((itm, idx) => {
-            api.update('containers', {
-                id: new_id,
-                user: {
-                    id: itm,
-                    type: "users"
-                }
-            }).then((res) => console.log(res))
-            .catch((reason) => console.log(reason));
-        });
+//        var new_id = res['data']['id'];
+//
+//        container_users.forEach((itm, idx) => {
+//            api.update('containers', {
+//                id: new_id,
+//                user: {
+//                    id: itm,
+//                    type: "users"
+//                }
+//            }).then((res) => console.log(res))
+//            .catch((reason) => console.log(reason));
+//        });
     }).catch((reason) => console.log(reason));
 
 });
@@ -129,7 +153,7 @@ $('#containerNewForm').submit(function(event) {
 <table>
     <tr><th>Name</th><th>Host</th><th>Status</th></tr>
 {% for c in content.containers %}
-<tr id="container{{c.id}}Row"><td>{{c.name}}</td><td>{{c.host.name}}</td><td>{{c.lxc().status}}</td>
+<tr id="container{{c.id}}Row"><td>{{c.name}}</td><td>{{c.host.name}}</td><td id="container{{c.id}}-status">{{c.lxc().status}}</td>
 {% if c.is_writeable_for(session_data.user) %}
 <td>
 <form id="container{{c.id}}DeleteForm">
@@ -142,14 +166,17 @@ $('#containerNewForm').submit(function(event) {
 $('#container{{c.id}}DeleteForm').submit(containerDelete);
 </script>
 <td>
-{% for action in ["start", "stop", "restart", "freeze", "unfreeze"] %}
+{% for action in ['start', 'stop', 'restart', 'freeze', 'unfreeze'] %}
 <form id="container{{c.id}}{{action}}Form">
 <input name="container_id" hidden="true" value="{{c.id}}">
 <input name="container_action" hidden="true" value="{{action}}">
-<input type="submit" value="{{action}} Container">
+<input id="container{{c.id}}{{action}}Submit" type="submit" value="{{action}} Container">
 </form>
 <script>
 $('#container{{c.id}}{{action}}Form').submit(containerSet);
+{% if not action in c.actions() %}
+$('#container{{c.id}}{{action}}Submit').hide();
+{%endif%}
 </script>
 {% endfor %}
 </td>
@@ -157,4 +184,96 @@ $('#container{{c.id}}{{action}}Form').submit(containerSet);
 {% endif %}
 {% endfor %}
 </table>
+
+<h3>Scheduling</h3>
+
+Resource Utilization:
+
+<table>
+    <tr><th>Host</th><th>RAM</th><th>CPU</th><th>Utilisation</th>
+{% for host in content.hosts %}
+{% set util = host.calc_utilisation() %}
+<tr><td>{{host.name}}</td><td>{{util['ram_demand']}} / {{host.nram}}</td><td>{{util['cpu_demand']}} / {{host.ncpu}}</td><td>{{util['utilisation']*100}}%</td></tr>
+{% endfor %}
+</table>
+
+Current slots:
+
+<table>
+<tr><th>Host / Container</th><th>CPU</th><th>RAM</th><th>Hours (Used/Total)</th></tr>
+{%for slot in content.slots %}
+<tr><td>{{slot.host.name}} / {{slot.container.name}}</td><td>{{slot.ncpu}}</td><td>{{slot.nram}}</td><td>{{slot.hours_used}} / {{slot.hours}}</td></tr>
+{%endfor %}
+</table>
+
+Schedule:
+
+<form id="scheduleForm">
+<table>
+    <tr><th>Container</th><td>
+            <select name="container_id">
+{% for c in content.containers %}
+<option value="{{c.id}}">{{c.name}}</option>
+{% endfor %}
+            </select>
+        </td></tr>
+        <tr><th>Size</th><td>
+            <select name="instance_id">
+{% for i in instances %}
+<option value="{{i.name}}">{{i.name}} ({{i.cpu}} Cores, {{i.ram}}GB RAM)</option>
+{% endfor %}
+            </select>
+        <tr><th>Host:</th><td>
+            <select name="container_host">
+                {% for host in content.hosts %}
+                <option value="{{host.id}}">{{host.name}}</option>
+                {% endfor %}
+            </select>
+        </td></tr>
+        </td></tr>
+        <tr><th>Hours</th><td><input name="hours" value="10"></input></td></tr>
+        <tr><td><input type="submit"></td></tr>
+</table>
+</form>
+<script>
+$('#scheduleForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        container_id = $form.find("select[name='container_id']").val(),
+        container_host = $form.find("select[name='container_host']").val(),
+        instance_id = $form.find("select[name='instance_id']").val(),
+        hours = $form.find("input[name='hours']").val();
+
+    const data = {
+        hours: hours,
+        instance: instance_id,
+        'host': {
+            'id': container_host
+        },
+        'container': {
+            'id': container_id
+        },
+    };
+
+    api.create(
+        'slot', data
+    ).then(res => {
+        console.log(res);
+
+//        var new_id = res['data']['id'];
+//
+//        container_users.forEach((itm, idx) => {
+//            api.update('containers', {
+//                id: new_id,
+//                user: {
+//                    id: itm,
+//                    type: "users"
+//                }
+//            }).then((res) => console.log(res))
+//            .catch((reason) => console.log(reason));
+//        });
+    }).catch((reason) => console.log(reason));
+});
+</script>
+
 {% endblock %}
