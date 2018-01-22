@@ -154,6 +154,7 @@ class Lib:
                             ('users', '/users'),
                             ('ressources', '/res'),
                             ('containers', '/containers'),
+                            ('scheduling', '/schedule'),
                         ],
                     },
                 )
@@ -232,7 +233,7 @@ class Session:
         if StrukAuth.test(username, password):
             print('login success ({})'.format(username))
             udata = StrukAuth.get_userdata(username)
-            dbu = User.query.filter(User.username == udata['uid']).one_or_none()
+            dbu = self._update_user(username, udata)
             self.set_login(username, dbu)
             return True
         else:
@@ -254,4 +255,31 @@ class Session:
 
     def clear_login(self):
         self.session.pop('username')
+
+    def _update_user(self, username, strukdata):
+        """Synchronize user/org data from StrukturDB
+
+        We synchronize this data every time a user logs in,
+        and can operate without a strukturdb connection as long as a user
+        has a logged in session.
+        """
+        db_user = User.query.filter(User.username == strukdata['uid']).one_or_none()
+        if not db_user:
+            db_user = User(group=None, username=username, is_admin=strukdata['isAdmin'])
+
+        struk_group = strukdata['org']
+        db_group = Group.query.filter(Group.name == struk_group).one_or_none()
+
+        if not db_group:
+            db_group = Group(org, False)
+            db_group.save()
+
+        if db_user.group != db_group:
+            db_user.group = db_group
+
+        if strukdata['sshKey']:
+            db_user.sshkey = '\n'.join(strukdata['sshKey'])
+        db_user.save()
+        return db_user
+
 

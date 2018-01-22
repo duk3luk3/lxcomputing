@@ -248,7 +248,16 @@ def if_containers():
     client = lib.lxclient
     images = client.images(None)
     config = current_app.config
-    return render_template('containers.html', images=images, instances=config['LXCP_INSTANCES'], **response)
+    return render_template('containers.html', images=images, **response)
+
+@app.route('/schedule/')
+def if_schedule():
+    lib = Lib.get_lib()
+    response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group, 'slots': Slot}))
+    client = lib.lxclient
+    images = client.images(None)
+    config = current_app.config
+    return render_template('scheduling.html', images=images, instances=config['LXCP_INSTANCES'], **response)
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 

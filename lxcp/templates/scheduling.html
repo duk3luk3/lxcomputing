@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Container Management{% endblock %}
+{% block content %}
+<h2>Scheduling</h2>
+
+<h3>Resource Utilization</h3>
+
+<table>
+    <tr><th>Host</th><th>RAM</th><th>CPU</th><th>Utilisation</th>
+{% for host in content.hosts %}
+{% set util = host.calc_utilisation() %}
+<tr><td>{{host.name}}</td><td>{{util['ram_demand']}} / {{host.nram}}</td><td>{{util['cpu_demand']}} / {{host.ncpu}}</td><td>{{util['utilisation']*100}}%</td></tr>
+{% endfor %}
+</table>
+
+<h3>Current slots:</h3>
+
+<table>
+<tr><th>Host / Container</th><th>CPU</th><th>RAM</th><th>Hours (Used/Total)</th></tr>
+{%for slot in content.slots %}
+<tr><td>{{slot.host.name}} / {{slot.container.name}}</td><td>{{slot.ncpu}}</td><td>{{slot.nram}}</td><td>{{slot.hours_used}} / {{slot.hours}}</td></tr>
+{%endfor %}
+</table>
+
+<h3>Schedule</h3>
+
+<form id="scheduleForm">
+<table>
+    <tr><th>Container</th><td>
+            <select name="container_id">
+{% for c in content.containers %}
+<option value="{{c.id}}">{{c.name}}</option>
+{% endfor %}
+            </select>
+        </td></tr>
+        <tr><th>Size</th><td>
+            <select name="instance_id">
+{% for i in instances %}
+<option value="{{i.name}}">{{i.name}} ({{i.cpu}} Cores, {{i.ram}}GB RAM)</option>
+{% endfor %}
+            </select>
+        <tr><th>Host:</th><td>
+            <select name="container_host">
+                {% for host in content.hosts %}
+                <option value="{{host.id}}">{{host.name}}</option>
+                {% endfor %}
+            </select>
+        </td></tr>
+        </td></tr>
+        <tr><th>Hours</th><td><input name="hours" value="10"></input></td></tr>
+        <tr><td><input type="submit"></td></tr>
+</table>
+</form>
+<script>
+$('#scheduleForm').submit(function(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        container_id = $form.find("select[name='container_id']").val(),
+        container_host = $form.find("select[name='container_host']").val(),
+        instance_id = $form.find("select[name='instance_id']").val(),
+        hours = $form.find("input[name='hours']").val();
+
+    const data = {
+        hours: hours,
+        instance: instance_id,
+        'host': {
+            'id': container_host
+        },
+        'container': {
+            'id': container_id
+        },
+    };
+
+    api.create(
+        'slot', data
+    ).then(res => {
+        console.log(res);
+
+//        var new_id = res['data']['id'];
+//
+//        container_users.forEach((itm, idx) => {
+//            api.update('containers', {
+//                id: new_id,
+//                user: {
+//                    id: itm,
+//                    type: "users"
+//                }
+//            }).then((res) => console.log(res))
+//            .catch((reason) => console.log(reason));
+//        });
+    }).catch((reason) => console.log(reason));
+});
+</script>
+
+{% endblock %}
