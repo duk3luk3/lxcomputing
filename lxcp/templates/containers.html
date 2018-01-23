@@ -65,13 +65,14 @@ function containerSet(event) {
 <form action="/" id="containerNewForm">
     <input type="hidden" name="container_creator" value="{{ session_data.user.id }}">
 	<table>
-{% if session_data.user.is_super_admin %}
 <tr><th>Image:</th><td><select name="container_image">
             {% for image in images %}
-            <option value="{{image.fingerprint}}">{{image.aliases[0]['name'] if image.aliases|count > 0 else image.properties['description'] }}</option>
+{% set img_name = image.aliases[0]['name'] if image.aliases|count > 0 else image.properties['description'] %}
+{% if session_data.user.is_super_admin or img_name.startswith('lxtemplate') %}
+            <option value="{{image.fingerprint}}">{{img_name}}</option>
+{% endif %}
             {% endfor %}
         </select></td>
-{% endif %}
 		<tr><th>Name:</th><td><input name="container_name"></td></tr>
 		<tr><th>Host:</th><td>
                         <select name="container_host">
@@ -100,10 +101,6 @@ $('#containerNewForm').submit(function(event) {
         container_creator = $form.find("input[name='container_creator']").val(),
         container_users = $form.find("select[name='container_users']").val();
 
-    container_host = parseInt(container_host);
-    container_creator = parseInt(container_creator);
-    container_users = container_users.map(x => parseInt(x));
-
     container_users = container_users.map(x => ({
         id: x,
         type: 'users'
@@ -118,8 +115,10 @@ $('#containerNewForm').submit(function(event) {
         'host': {
             'id': container_host,
             'type': 'hosts'
-        },
-        'users': container_users
+        }
+// can't create container with users because lxc container needs to be created
+// before users can be added
+//        , 'users': container_users
     };
 
     if (container_image != null) {
@@ -129,20 +128,16 @@ $('#containerNewForm').submit(function(event) {
     api.create(
         'container', data
     ).then(res => {
+        //so we add users here
         console.log(res);
 
-//        var new_id = res['data']['id'];
-//
-//        container_users.forEach((itm, idx) => {
-//            api.update('containers', {
-//                id: new_id,
-//                user: {
-//                    id: itm,
-//                    type: "users"
-//                }
-//            }).then((res) => console.log(res))
-//            .catch((reason) => console.log(reason));
-//        });
+        var new_id = res['data']['id'];
+
+        api.update('containers', {
+            id: new_id,
+            users: container_users
+        }).then((res) => console.log(res))
+        .catch((reason) => console.log(reason));
     }).catch((reason) => console.log(reason));
 
 });

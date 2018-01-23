@@ -60,14 +60,11 @@ $('#nfsNewForm').submit(function(event) {
         nfs_mapping = $form.find("input[name='nfs_mapping']").val(),
         nfs_group = $form.find("select[name='nfs_group']").val();
 
-    nfs_group = parseInt(nfs_group);
-
     api.create('nfs', {
         path: nfs_path,
         mapping: nfs_mapping,
-        'group': {
-            'id': nfs_group,
-            'type': 'groups'
+        group: {
+            id: nfs_group
         }
     }).then(res => console.log(res))
         .catch((reason) => console.log(reason));
@@ -77,6 +74,11 @@ $('#nfsNewForm').submit(function(event) {
 
 <h2>Hosts</h2>
 
+{% if session_data.user.is_super_admin %}
+{% else %}
+These are the available compute hosts, listed here for your information.
+{% endif %}
+
 <table>
     <tr><th>ID</th><th>Name</th><th>Cores</th><th>RAM (GB)</th><th>Space (TB)</th></tr>
 {% for host in content.hosts %}
@@ -85,6 +87,8 @@ $('#nfsNewForm').submit(function(event) {
 </table>
 
 <h2>NFS Mappings</h2>
+
+Filesystem Mappings require preparation on all hosts. Please contact RBG to create NFS Mappings for your org.
 
 <table>
     <tr><th>ID</th><th>Group</th><th>Path</th><th>Mapping</th></tr>

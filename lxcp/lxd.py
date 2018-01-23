@@ -13,13 +13,27 @@ class LXClient:
                 verify=False
                 )
 
-    def cont_create(self, host, name, image):
+    def cont_create(self, host, container):
+        name = container.name
+        image = container.image
         if image:
             source = {'type': 'image', 'fingerprint': image}
         else:
             source = {'type': 'image', 'alias': 'xenial'}
         config = {'name': name, 'source': source}
-        container = self.client.containers.create(config, wait=False)
+
+        mappings = container.creator.group.group_shares
+
+        if len(mappings) > 0:
+            config['devices'] = {
+                    mapping.mapping: {
+                        'path': '/srv/' + mapping.mapping,
+                        'source': '/compute/' + mapping.mapping,
+                        'type': 'disk'
+                    } for mapping in mappings
+                }
+
+        container = self.client.containers.create(config, wait=True)
         return container
 
     def cont_get(self, host, name):
@@ -28,6 +42,8 @@ class LXClient:
 
     def cont_delete(self, host, name):
         container = self.client.containers.get(name)
+        if container.status == 'Running':
+            container.stop()
         container.delete()
 
     def cont_provision(self, host, container):
@@ -38,7 +54,7 @@ class LXClient:
         * Converts container to template
         """
         cont = self.cont_get(host, container.name)
-        if cont.status != 'RUNNING':
+        if cont.status != 'Running':
             cont.start()
         p = Path(__file__).parent / 'files' / 'provision.sh'
         with p.open() as f:
@@ -76,6 +92,8 @@ class LXClient:
 
     def cont_adduser(self, host, container, user):
         cnt = self.cont_get(host, container.name)
+        if cnt.status != 'Running':
+            cnt.start()
         suser = StrukAuth.get_userdata(user.username)
         add_cmd = ['adduser',
                 '--uid', str(suser['uidNumber']),
@@ -99,7 +117,7 @@ class LXClient:
             print('res', res)
         sshkey = user.sshkey
         if sshkey:
-            ssh_cmd = ['sudo', '-u', 'erlacher', 'bash', '-x', '-c', 'cd /home/{}; umask 077; test -d .ssh || mkdir .ssh ; echo {} >> .ssh/authorized_keys'.format(suser['uid'], sshkey)]
+            ssh_cmd = ['sudo', '-u', suser['uid'], 'bash', '-x', '-c', 'cd /home/{}; umask 077; test -d .ssh || mkdir .ssh ; echo -e {} >> .ssh/authorized_keys'.format(suser['uid'], sshkey.replace('\n', '\\n'))]
             res = cnt.execute(ssh_cmd)
             print('cmd', ssh_cmd, 'res', res)
 

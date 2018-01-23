@@ -1,5 +1,1218 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.kitsu = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function(global,factory){'object'==typeof exports&&'undefined'!=typeof module?module.exports=factory(require('babel-runtime/regenerator'),require('babel-runtime/helpers/slicedToArray'),require('babel-runtime/helpers/asyncToGenerator'),require('babel-runtime/helpers/classCallCheck'),require('babel-runtime/helpers/createClass'),require('axios')):'function'==typeof define&&define.amd?define(['babel-runtime/regenerator','babel-runtime/helpers/slicedToArray','babel-runtime/helpers/asyncToGenerator','babel-runtime/helpers/classCallCheck','babel-runtime/helpers/createClass','axios'],factory):global.kitsu=factory(global._regeneratorRuntime,global._slicedToArray,global._asyncToGenerator,global._classCallCheck,global._createClass,global.axios)})(this,function(_regeneratorRuntime,_slicedToArray,_asyncToGenerator,_classCallCheck,_createClass,axios){'use strict';function error(E){if(E.response){var e=E.response.data;if(e)return e}else if(E.errors)return E;throw E}function query(params){try{var _query='',_loop=function(param){'object'==typeof params[param]?Object.keys(params[param]).forEach(function(value){_query+=`&${param}[${value}]=${params[param][value]}`}):'string'==typeof params[param]&&(_query+=`&${param}=${params[param]}`)};for(var param in params)_loop(param);return params?_query.slice(1):''}catch(E){error(E)}}_regeneratorRuntime=_regeneratorRuntime&&_regeneratorRuntime.hasOwnProperty('default')?_regeneratorRuntime['default']:_regeneratorRuntime,_slicedToArray=_slicedToArray&&_slicedToArray.hasOwnProperty('default')?_slicedToArray['default']:_slicedToArray,_asyncToGenerator=_asyncToGenerator&&_asyncToGenerator.hasOwnProperty('default')?_asyncToGenerator['default']:_asyncToGenerator,_classCallCheck=_classCallCheck&&_classCallCheck.hasOwnProperty('default')?_classCallCheck['default']:_classCallCheck,_createClass=_createClass&&_createClass.hasOwnProperty('default')?_createClass['default']:_createClass,axios=axios&&axios.hasOwnProperty('default')?axios['default']:axios;var deattribute=function(){var _ref=_asyncToGenerator(_regeneratorRuntime.mark(function _callee2(data){var _this=this;return _regeneratorRuntime.wrap(function(_context2){for(;;)switch(_context2.prev=_context2.next){case 0:if(_context2.prev=0,'object'!=typeof data||null===data){_context2.next=8;break}if(!Array.isArray(data)){_context2.next=7;break}return _context2.next=5,data.map(function(){var _ref2=_asyncToGenerator(_regeneratorRuntime.mark(function _callee(el){return _regeneratorRuntime.wrap(function(_context){for(;;)switch(_context.prev=_context.next){case 0:return _context.abrupt('return',deattribute(el));case 1:case'end':return _context.stop();}},_callee,_this)}));return function(){return _ref2.apply(this,arguments)}}());case 5:_context2.next=8;break;case 7:data.attributes&&data.attributes.constructor===Object&&(Object.keys(data.attributes).forEach(function(key){data[key]=data.attributes[key]}),delete data.attributes);case 8:return _context2.abrupt('return',data);case 11:_context2.prev=11,_context2.t0=_context2['catch'](0),error(_context2.t0);case 14:case'end':return _context2.stop();}},_callee2,this,[[0,11]])}));return function(){return _ref.apply(this,arguments)}}(),deserialiseArray=function(){var _ref=_asyncToGenerator(_regeneratorRuntime.mark(function _callee(obj){var _iteratorNormalCompletion,_didIteratorError,_iteratorError,_iterator,_step,value;return _regeneratorRuntime.wrap(function(_context){for(;;)switch(_context.prev=_context.next){case 0:return _context.prev=0,_iteratorNormalCompletion=!0,_didIteratorError=!1,_iteratorError=void 0,_context.prev=4,_context.next=7,obj.data;case 7:_context.t0=Symbol.iterator,_iterator=_context.sent[_context.t0]();case 9:if(_iteratorNormalCompletion=(_step=_iterator.next()).done){_context.next=23;break}if(value=_step.value,!obj.included){_context.next=15;break}return _context.next=14,linkRelationships(value,obj.included);case 14:value=_context.sent;case 15:if(!value.attributes){_context.next=19;break}return _context.next=18,deattribute(value);case 18:value=_context.sent;case 19:obj.data[obj.data.indexOf(value)]=value;case 20:_iteratorNormalCompletion=!0,_context.next=9;break;case 23:_context.next=29;break;case 25:_context.prev=25,_context.t1=_context['catch'](4),_didIteratorError=!0,_iteratorError=_context.t1;case 29:_context.prev=29,_context.prev=30,!_iteratorNormalCompletion&&_iterator.return&&_iterator.return();case 32:if(_context.prev=32,!_didIteratorError){_context.next=35;break}throw _iteratorError;case 35:return _context.finish(32);case 36:return _context.finish(29);case 37:return _context.abrupt('return',obj);case 40:_context.prev=40,_context.t2=_context['catch'](0),error(_context.t2);case 43:case'end':return _context.stop();}},_callee,this,[[0,40],[4,25,29,37],[30,,32,36]])}));return function(){return _ref.apply(this,arguments)}}(),deserialise=function(){var _ref2=_asyncToGenerator(_regeneratorRuntime.mark(function _callee2(obj){return _regeneratorRuntime.wrap(function(_context2){for(;;)switch(_context2.prev=_context2.next){case 0:if(_context2.prev=0,!(obj.data&&obj.data.constructor===Array)){_context2.next=7;break}return _context2.next=4,deserialiseArray(obj);case 4:obj=_context2.sent,_context2.next=11;break;case 7:if(!obj.included){_context2.next=11;break}return _context2.next=10,linkRelationships(obj.data,obj.included);case 10:obj.data=_context2.sent;case 11:if(delete obj.included,!obj.data.attributes){_context2.next=16;break}return _context2.next=15,deattribute(obj.data);case 15:obj.data=_context2.sent;case 16:return _context2.abrupt('return',obj);case 19:_context2.prev=19,_context2.t0=_context2['catch'](0),error(_context2.t0);case 22:case'end':return _context2.stop();}},_callee2,this,[[0,19]])}));return function(){return _ref2.apply(this,arguments)}}(),filterIncludes=function(){var _ref=_asyncToGenerator(_regeneratorRuntime.mark(function _callee(included,_ref2){var id=_ref2.id,type=_ref2.type;return _regeneratorRuntime.wrap(function(_context){for(;;)switch(_context.prev=_context.next){case 0:return _context.prev=0,_context.abrupt('return',included.filter(function(el){return el.id===id&&el.type===type})[0]||{id,type});case 4:_context.prev=4,_context.t0=_context['catch'](0),error(_context.t0);case 7:case'end':return _context.stop();}},_callee,this,[[0,4]])}));return function(){return _ref.apply(this,arguments)}}(),linkRelationships=function(){var _ref=_asyncToGenerator(_regeneratorRuntime.mark(function _callee(data,included){var relationships,key,_iteratorNormalCompletion,_didIteratorError,_iteratorError,_iterator,_step,_ref2,id,type,deattributed,_relationships$key$da,_id,_type,_deattributed;return _regeneratorRuntime.wrap(function(_context){for(;;)switch(_context.prev=_context.next){case 0:return _context.prev=0,relationships=data.relationships,_context.next=4,relationships;case 4:_context.t0=_regeneratorRuntime.keys(_context.sent);case 5:if((_context.t1=_context.t0()).done){_context.next=59;break}if(key=_context.t1.value,!(relationships[key].data&&Array.isArray(relationships[key].data))){_context.next=46;break}return _iteratorNormalCompletion=!0,_didIteratorError=!1,_iteratorError=void 0,_context.prev=11,_context.next=14,relationships[key].data;case 14:_context.t2=Symbol.iterator,_iterator=_context.sent[_context.t2]();case 16:if(_iteratorNormalCompletion=(_step=_iterator.next()).done){_context.next=30;break}return _ref2=_step.value,id=_ref2.id,type=_ref2.type,_context.t3=deattribute,_context.next=22,filterIncludes(included,{id,type});case 22:return _context.t4=_context.sent,_context.next=25,(0,_context.t3)(_context.t4);case 25:deattributed=_context.sent,'undefined'!=typeof deattributed&&(!data[key]&&(data[key]=[]),data[key].push(deattributed));case 27:_iteratorNormalCompletion=!0,_context.next=16;break;case 30:_context.next=36;break;case 32:_context.prev=32,_context.t5=_context['catch'](11),_didIteratorError=!0,_iteratorError=_context.t5;case 36:_context.prev=36,_context.prev=37,!_iteratorNormalCompletion&&_iterator.return&&_iterator.return();case 39:if(_context.prev=39,!_didIteratorError){_context.next=42;break}throw _iteratorError;case 42:return _context.finish(39);case 43:return _context.finish(36);case 44:_context.next=57;break;case 46:if(!relationships[key].data){_context.next=57;break}return _relationships$key$da=relationships[key].data,_id=_relationships$key$da.id,_type=_relationships$key$da.type,_context.t6=deattribute,_context.next=51,filterIncludes(included,{id:_id,type:_type});case 51:return _context.t7=_context.sent,_context.next=54,(0,_context.t6)(_context.t7);case 54:_deattributed=_context.sent,'undefined'==typeof _deattributed||data[key]||(data[key]=_deattributed),delete data[key].relationships;case 57:_context.next=5;break;case 59:return delete data.relationships,_context.abrupt('return',data);case 63:_context.prev=63,_context.t8=_context['catch'](0),error(_context.t8);case 66:case'end':return _context.stop();}},_callee,this,[[0,63],[11,32,36,44],[37,,39,43]])}));return function(){return _ref.apply(this,arguments)}}(),serialise=function(){var _ref=_asyncToGenerator(_regeneratorRuntime.mark(function _callee(model){var type,data,_loop,prop,_this=this,obj=1<arguments.length&&arguments[1]!==void 0?arguments[1]:{},method=2<arguments.length&&arguments[2]!==void 0?arguments[2]:'POST';return _regeneratorRuntime.wrap(function(_context){for(;;)switch(_context.prev=_context.next){case 0:if(_context.prev=0,obj.constructor===Object&&0!==Object.keys(obj).length){_context.next=3;break}throw new Error(`${method} requires a JSON object body`);case 3:if(type=this.plural(this.camel(model)),data={type},'POST'===method||'undefined'!=typeof obj.id){_context.next=7;break}throw new Error(`${method} requires an ID for the ${type} type`);case 7:for(prop in'POST'!==method&&(data.id=obj.id.toString()),_loop=function(prop){if(null!==obj[prop]&&obj[prop].constructor===Object){if('string'==typeof obj[prop].id)'undefined'==typeof data.relationships&&(data.relationships={}),'undefined'==typeof obj[prop].type&&(obj[prop].type=_this.plural(_this.camel(prop))),data.relationships[prop]={data:Object.assign(obj[prop])};else throw new Error(`${method} requires an ID for the ${prop} relationships`);}else if(null!==obj[prop]&&Array.isArray(obj[prop])){var ptype=_this.plural(_this.camel(prop));'undefined'==typeof data.relationships&&(data.relationships={}),data.relationships[prop]={data:obj[prop].map(function(elem){if('undefined'==typeof elem.id)throw new Error(`${method} requires an ID for the ${prop} relationships`);return{id:elem.id,type:elem.type||ptype}})}}else'id'!==prop&&'type'!==prop&&('undefined'==typeof data.attributes&&(data.attributes={}),data.attributes[prop]=obj[prop])},obj)_loop(prop);return _context.abrupt('return',{data});case 13:throw _context.prev=13,_context.t0=_context['catch'](0),_context.t0;case 16:case'end':return _context.stop();}},_callee,this,[[0,13]])}));return function(){return _ref.apply(this,arguments)}}(),camel=function(s){return s.replace(/[-_][a-z\u00E0-\u00F6\u00F8-\u00FE]/g,function(match){return match.slice(1).toUpperCase()})},kebab=function(s){return s.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g,function(match){return'-'+match.toLowerCase()})},snake=function(s){return s.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g,function(match){return'_'+match.toLowerCase()})},jsonAPI='application/vnd.api+json',jsonAPIHeader={Accept:jsonAPI,"Content-Type":jsonAPI},Kitsu=function(){function Kitsu(){var options=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{};_classCallCheck(this,Kitsu),this.fetch=this.get,this.update=this.patch,this.create=this.post,this.camel=!1===options.camelCaseTypes?function(s){return s}:camel,this.resCase='none'===options.resourceCase?function(s){return s}:'snake'===options.resourceCase?snake:kebab,this.plural=!1===options.pluralize?function(s){return s}:require('pluralize'),this.headers=Object.assign({},options.headers,jsonAPIHeader),axios.defaults.baseURL=options.baseURL||'https://kitsu.io/api/edge',axios.defaults.timeout=options.timeout||3e4}return _createClass(Kitsu,[{key:'get',value:function(){var _ref=_asyncToGenerator(_regeneratorRuntime.mark(function _callee(model){var _model$split,_model$split2,res,id,url,_ref2,data,params=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{},headers=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{};return _regeneratorRuntime.wrap(function(_context){for(;;)switch(_context.prev=_context.next){case 0:return _context.prev=0,_model$split=model.split('/'),_model$split2=_slicedToArray(_model$split,2),res=_model$split2[0],id=_model$split2[1],url=this.plural(this.resCase(res))+(id?'/'+id:''),_context.next=5,axios.get(url,{params,paramsSerializer:function(p){return query(p)},headers:Object.assign(this.headers,headers,jsonAPIHeader)});case 5:return _ref2=_context.sent,data=_ref2.data,_context.abrupt('return',deserialise(data));case 10:return _context.prev=10,_context.t0=_context['catch'](0),_context.abrupt('return',error(_context.t0));case 13:case'end':return _context.stop();}},_callee,this,[[0,10]])}));return function(){return _ref.apply(this,arguments)}}()},{key:'patch',value:function(){var _ref3=_asyncToGenerator(_regeneratorRuntime.mark(function _callee2(model,body){var url,_ref4,data,headers=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{};return _regeneratorRuntime.wrap(function(_context2){for(;;)switch(_context2.prev=_context2.next){case 0:if(_context2.prev=0,headers=Object.assign(this.headers,headers,jsonAPIHeader),this.isAuth){_context2.next=4;break}throw new Error('Not logged in');case 4:if('undefined'!=typeof body.id){_context2.next=6;break}throw new Error('Updating a resource requires an ID');case 6:return url=this.plural(this.resCase(model))+'/'+body.id,_context2.t0=axios,_context2.t1=url,_context2.next=11,serialise.apply(this,[model,body,'PATCH']);case 11:return _context2.t2=_context2.sent,_context2.t3={headers},_context2.next=15,_context2.t0.patch.call(_context2.t0,_context2.t1,_context2.t2,_context2.t3);case 15:return _ref4=_context2.sent,data=_ref4.data,_context2.abrupt('return',data);case 20:return _context2.prev=20,_context2.t4=_context2['catch'](0),_context2.abrupt('return',error(_context2.t4));case 23:case'end':return _context2.stop();}},_callee2,this,[[0,20]])}));return function(){return _ref3.apply(this,arguments)}}()},{key:'post',value:function(){var _ref5=_asyncToGenerator(_regeneratorRuntime.mark(function _callee3(model,body){var url,_ref6,data,headers=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{};return _regeneratorRuntime.wrap(function(_context3){for(;;)switch(_context3.prev=_context3.next){case 0:if(_context3.prev=0,headers=Object.assign(this.headers,headers,jsonAPIHeader),this.isAuth){_context3.next=4;break}throw new Error('Not logged in');case 4:return url=this.plural(this.resCase(model)),_context3.t0=axios,_context3.t1=url,_context3.next=9,serialise.apply(this,[model,body]);case 9:return _context3.t2=_context3.sent,_context3.t3={headers},_context3.next=13,_context3.t0.post.call(_context3.t0,_context3.t1,_context3.t2,_context3.t3);case 13:return _ref6=_context3.sent,data=_ref6.data,_context3.abrupt('return',data);case 18:return _context3.prev=18,_context3.t4=_context3['catch'](0),_context3.abrupt('return',error(_context3.t4));case 21:case'end':return _context3.stop();}},_callee3,this,[[0,18]])}));return function(){return _ref5.apply(this,arguments)}}()},{key:'remove',value:function(){var _ref7=_asyncToGenerator(_regeneratorRuntime.mark(function _callee4(model,id){var url,_ref8,data,headers=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{};return _regeneratorRuntime.wrap(function(_context4){for(;;)switch(_context4.prev=_context4.next){case 0:if(_context4.prev=0,headers=Object.assign(this.headers,headers,jsonAPIHeader),this.isAuth){_context4.next=4;break}throw new Error('Not logged in');case 4:return url=this.plural(this.resCase(model))+'/'+id,_context4.t0=axios,_context4.t1=url,_context4.next=9,serialise.apply(this,[model,{id},'DELETE']);case 9:return _context4.t2=_context4.sent,_context4.t3=headers,_context4.t4={data:_context4.t2,headers:_context4.t3},_context4.next=14,_context4.t0.delete.call(_context4.t0,_context4.t1,_context4.t4);case 14:return _ref8=_context4.sent,data=_ref8.data,_context4.abrupt('return',data);case 19:return _context4.prev=19,_context4.t5=_context4['catch'](0),_context4.abrupt('return',error(_context4.t5));case 22:case'end':return _context4.stop();}},_callee4,this,[[0,19]])}));return function(){return _ref7.apply(this,arguments)}}()},{key:'self',value:function(){var _ref9=_asyncToGenerator(_regeneratorRuntime.mark(function _callee5(){var res,params=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{},headers=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{};return _regeneratorRuntime.wrap(function(_context5){for(;;)switch(_context5.prev=_context5.next){case 0:return _context5.prev=0,_context5.next=3,this.get('users',Object.assign({filter:{self:!0}},params),headers);case 3:if(res=_context5.sent,!res.errors){_context5.next=6;break}throw res;case 6:return _context5.abrupt('return',res.data[0]);case 9:return _context5.prev=9,_context5.t0=_context5['catch'](0),_context5.abrupt('return',error(_context5.t0));case 12:case'end':return _context5.stop();}},_callee5,this,[[0,9]])}));return function(){return _ref9.apply(this,arguments)}}()},{key:'isAuth',get:function(){return!!this.headers.Authorization}}]),Kitsu}();return Kitsu});
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('babel-runtime/regenerator'), require('babel-runtime/helpers/slicedToArray'), require('babel-runtime/helpers/asyncToGenerator'), require('babel-runtime/helpers/classCallCheck'), require('babel-runtime/helpers/createClass'), require('axios')) :
+	typeof define === 'function' && define.amd ? define(['babel-runtime/regenerator', 'babel-runtime/helpers/slicedToArray', 'babel-runtime/helpers/asyncToGenerator', 'babel-runtime/helpers/classCallCheck', 'babel-runtime/helpers/createClass', 'axios'], factory) :
+	(global.kitsu = factory(global._regeneratorRuntime,global._slicedToArray,global._asyncToGenerator,global._classCallCheck,global._createClass,global.axios));
+}(this, (function (_regeneratorRuntime,_slicedToArray,_asyncToGenerator,_classCallCheck,_createClass,axios) { 'use strict';
+
+_regeneratorRuntime = _regeneratorRuntime && _regeneratorRuntime.hasOwnProperty('default') ? _regeneratorRuntime['default'] : _regeneratorRuntime;
+_slicedToArray = _slicedToArray && _slicedToArray.hasOwnProperty('default') ? _slicedToArray['default'] : _slicedToArray;
+_asyncToGenerator = _asyncToGenerator && _asyncToGenerator.hasOwnProperty('default') ? _asyncToGenerator['default'] : _asyncToGenerator;
+_classCallCheck = _classCallCheck && _classCallCheck.hasOwnProperty('default') ? _classCallCheck['default'] : _classCallCheck;
+_createClass = _createClass && _createClass.hasOwnProperty('default') ? _createClass['default'] : _createClass;
+axios = axios && axios.hasOwnProperty('default') ? axios['default'] : axios;
+
+/**
+ * Hoists attributes to be top-level
+ *
+ * @param {Object|Array} data Resource data
+ * @returns {Object|Array} Deattributed resource data
+ * @private
+ */
+var deattribute = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(data) {
+    var _this = this;
+
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.prev = 0;
+
+            if (!(typeof data === 'object' && data !== null)) {
+              _context2.next = 8;
+              break;
+            }
+
+            if (!Array.isArray(data)) {
+              _context2.next = 7;
+              break;
+            }
+
+            _context2.next = 5;
+            return data.map(function () {
+              var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(el) {
+                return _regeneratorRuntime.wrap(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        return _context.abrupt('return', deattribute(el));
+
+                      case 1:
+                      case 'end':
+                        return _context.stop();
+                    }
+                  }
+                }, _callee, _this);
+              }));
+
+              return function (_x2) {
+                return _ref2.apply(this, arguments);
+              };
+            }());
+
+          case 5:
+            _context2.next = 8;
+            break;
+
+          case 7:
+            if (data.attributes && data.attributes.constructor === Object) {
+              Object.keys(data.attributes).forEach(function (key) {
+                data[key] = data.attributes[key];
+              });
+              delete data.attributes;
+            }
+
+          case 8:
+            return _context2.abrupt('return', data);
+
+          case 11:
+            _context2.prev = 11;
+            _context2.t0 = _context2['catch'](0);
+
+            error(_context2.t0);
+
+          case 14:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this, [[0, 11]]);
+  }));
+
+  return function deattribute(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+/**
+ * Deserialises an array from a JSON-API structure
+ *
+ * @param {*} obj The response
+ * @returns {Object} The deserialised response
+ * @private
+ */
+var deserialiseArray = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(obj) {
+    var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, value;
+
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.prev = 0;
+            _iteratorNormalCompletion = true;
+            _didIteratorError = false;
+            _iteratorError = undefined;
+            _context.prev = 4;
+            _context.next = 7;
+            return obj.data;
+
+          case 7:
+            _context.t0 = Symbol.iterator;
+            _iterator = _context.sent[_context.t0]();
+
+          case 9:
+            if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+              _context.next = 23;
+              break;
+            }
+
+            value = _step.value;
+
+            if (!obj.included) {
+              _context.next = 15;
+              break;
+            }
+
+            _context.next = 14;
+            return linkRelationships(value, obj.included);
+
+          case 14:
+            value = _context.sent;
+
+          case 15:
+            if (!value.attributes) {
+              _context.next = 19;
+              break;
+            }
+
+            _context.next = 18;
+            return deattribute(value);
+
+          case 18:
+            value = _context.sent;
+
+          case 19:
+            obj.data[obj.data.indexOf(value)] = value;
+
+          case 20:
+            _iteratorNormalCompletion = true;
+            _context.next = 9;
+            break;
+
+          case 23:
+            _context.next = 29;
+            break;
+
+          case 25:
+            _context.prev = 25;
+            _context.t1 = _context['catch'](4);
+            _didIteratorError = true;
+            _iteratorError = _context.t1;
+
+          case 29:
+            _context.prev = 29;
+            _context.prev = 30;
+
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+
+          case 32:
+            _context.prev = 32;
+
+            if (!_didIteratorError) {
+              _context.next = 35;
+              break;
+            }
+
+            throw _iteratorError;
+
+          case 35:
+            return _context.finish(32);
+
+          case 36:
+            return _context.finish(29);
+
+          case 37:
+            return _context.abrupt('return', obj);
+
+          case 40:
+            _context.prev = 40;
+            _context.t2 = _context['catch'](0);
+
+            error(_context.t2);
+
+          case 43:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, this, [[0, 40], [4, 25, 29, 37], [30,, 32, 36]]);
+  }));
+
+  return function deserialiseArray(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+/**
+ * Deserialises an object from a JSON-API structure
+ *
+ * @param {Object} obj The response
+ * @returns {Object} The deserialised response
+ * @private
+ */
+
+
+var deserialise = function () {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(obj) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.prev = 0;
+
+            if (!(obj.data && obj.data.constructor === Array)) {
+              _context2.next = 7;
+              break;
+            }
+
+            _context2.next = 4;
+            return deserialiseArray(obj);
+
+          case 4:
+            obj = _context2.sent;
+            _context2.next = 11;
+            break;
+
+          case 7:
+            if (!obj.included) {
+              _context2.next = 11;
+              break;
+            }
+
+            _context2.next = 10;
+            return linkRelationships(obj.data, obj.included);
+
+          case 10:
+            obj.data = _context2.sent;
+
+          case 11:
+
+            delete obj.included;
+
+            // Move attributes to the parent object
+
+            if (!obj.data.attributes) {
+              _context2.next = 16;
+              break;
+            }
+
+            _context2.next = 15;
+            return deattribute(obj.data);
+
+          case 15:
+            obj.data = _context2.sent;
+
+          case 16:
+            return _context2.abrupt('return', obj);
+
+          case 19:
+            _context2.prev = 19;
+            _context2.t0 = _context2['catch'](0);
+
+            error(_context2.t0);
+
+          case 22:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this, [[0, 19]]);
+  }));
+
+  return function deserialise(_x2) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+function error(E) {
+  if (E.response) {
+    var e = E.response.data;
+    if (e) return e;
+  } else if (E.errors) return E;
+  throw E;
+}
+
+/**
+ * Filters includes for the specific relationship
+ *
+ * @param {Object} included The response included object
+ * @param {Object} opts
+ * @param {string} opts.id The relationship ID
+ * @param {string} opts.type The relationship type
+ * @returns {Array} The matched includes
+ * @private
+ */
+var filterIncludes = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(included, _ref2) {
+    var id = _ref2.id,
+        type = _ref2.type;
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.prev = 0;
+            return _context.abrupt('return', included.filter(function (el) {
+              return el.id === id && el.type === type;
+            })[0] || { id, type });
+
+          case 4:
+            _context.prev = 4;
+            _context.t0 = _context['catch'](0);
+
+            error(_context.t0);
+
+          case 7:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, this, [[0, 4]]);
+  }));
+
+  return function filterIncludes(_x, _x2) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+/**
+ * Links relationships to included data
+ *
+ * @param {Object} data The response data object
+ * @param {Object} included The response included object
+ * @private
+ */
+var linkRelationships = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(data, included) {
+    var relationships, key, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _ref2, id, type, deattributed, _relationships$key$da, _id, _type, _deattributed;
+
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.prev = 0;
+            relationships = data.relationships;
+            _context.next = 4;
+            return relationships;
+
+          case 4:
+            _context.t0 = _regeneratorRuntime.keys(_context.sent);
+
+          case 5:
+            if ((_context.t1 = _context.t0()).done) {
+              _context.next = 59;
+              break;
+            }
+
+            key = _context.t1.value;
+
+            if (!(relationships[key].data && Array.isArray(relationships[key].data))) {
+              _context.next = 46;
+              break;
+            }
+
+            _iteratorNormalCompletion = true;
+            _didIteratorError = false;
+            _iteratorError = undefined;
+            _context.prev = 11;
+            _context.next = 14;
+            return relationships[key].data;
+
+          case 14:
+            _context.t2 = Symbol.iterator;
+            _iterator = _context.sent[_context.t2]();
+
+          case 16:
+            if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+              _context.next = 30;
+              break;
+            }
+
+            _ref2 = _step.value;
+            id = _ref2.id, type = _ref2.type;
+            _context.t3 = deattribute;
+            _context.next = 22;
+            return filterIncludes(included, { id, type });
+
+          case 22:
+            _context.t4 = _context.sent;
+            _context.next = 25;
+            return (0, _context.t3)(_context.t4);
+
+          case 25:
+            deattributed = _context.sent;
+
+            if (typeof deattributed !== 'undefined') {
+              if (!data[key]) data[key] = [];
+              data[key].push(deattributed);
+            }
+
+          case 27:
+            _iteratorNormalCompletion = true;
+            _context.next = 16;
+            break;
+
+          case 30:
+            _context.next = 36;
+            break;
+
+          case 32:
+            _context.prev = 32;
+            _context.t5 = _context['catch'](11);
+            _didIteratorError = true;
+            _iteratorError = _context.t5;
+
+          case 36:
+            _context.prev = 36;
+            _context.prev = 37;
+
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+
+          case 39:
+            _context.prev = 39;
+
+            if (!_didIteratorError) {
+              _context.next = 42;
+              break;
+            }
+
+            throw _iteratorError;
+
+          case 42:
+            return _context.finish(39);
+
+          case 43:
+            return _context.finish(36);
+
+          case 44:
+            _context.next = 57;
+            break;
+
+          case 46:
+            if (!relationships[key].data) {
+              _context.next = 57;
+              break;
+            }
+
+            _relationships$key$da = relationships[key].data, _id = _relationships$key$da.id, _type = _relationships$key$da.type;
+            _context.t6 = deattribute;
+            _context.next = 51;
+            return filterIncludes(included, { id: _id, type: _type });
+
+          case 51:
+            _context.t7 = _context.sent;
+            _context.next = 54;
+            return (0, _context.t6)(_context.t7);
+
+          case 54:
+            _deattributed = _context.sent;
+
+            if (typeof _deattributed !== 'undefined' && !data[key]) data[key] = _deattributed;
+            delete data[key].relationships;
+
+          case 57:
+            _context.next = 5;
+            break;
+
+          case 59:
+
+            delete data.relationships;
+
+            return _context.abrupt('return', data);
+
+          case 63:
+            _context.prev = 63;
+            _context.t8 = _context['catch'](0);
+
+            error(_context.t8);
+
+          case 66:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, this, [[0, 63], [11, 32, 36, 44], [37,, 39, 43]]);
+  }));
+
+  return function linkRelationships(_x, _x2) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+function query(params) {
+  try {
+    var _query = '';
+
+    var _loop = function _loop(param) {
+      if (typeof params[param] === 'object') {
+        Object.keys(params[param]).forEach(function (value) {
+          _query += `&${param}[${value}]=${params[param][value]}`;
+        });
+      } else if (typeof params[param] === 'string') {
+        _query += `&${param}=${params[param]}`;
+      }
+    };
+
+    for (var param in params) {
+      _loop(param);
+    }
+
+    return params ? _query.slice(1) : '';
+  } catch (E) {
+    error(E);
+  }
+}
+
+/**
+ * Serialises an object into a JSON-API structure
+ *
+ * @param {string} model Request model
+ * @param {Object} obj The data
+ * @param {string} method Request type
+ * @returns {Object} The serialised data
+ * @private
+ */
+var serialise = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(model) {
+    var _this = this;
+
+    var obj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var method = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'POST';
+
+    var type, data, _loop, prop;
+
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.prev = 0;
+
+            if (!(obj.constructor !== Object || Object.keys(obj).length === 0)) {
+              _context.next = 3;
+              break;
+            }
+
+            throw new Error(`${method} requires a JSON object body`);
+
+          case 3:
+            type = this.plural(this.camel(model));
+            data = { type
+
+              // A POST request is the only request to not require an ID
+            };
+
+            if (!(method !== 'POST' && typeof obj.id === 'undefined')) {
+              _context.next = 7;
+              break;
+            }
+
+            throw new Error(`${method} requires an ID for the ${type} type`);
+
+          case 7:
+
+            // Add ID to data - MUST be a string
+            if (method !== 'POST') {
+              data.id = obj.id.toString();
+            }
+
+            // Attributes and relationships
+
+            _loop = function _loop(prop) {
+              // Check if it's a relationship
+              if (obj[prop] !== null && obj[prop].constructor === Object) {
+                if (typeof obj[prop].id === 'string') {
+                  if (typeof data.relationships === 'undefined') data.relationships = {};
+                  // Guess relationship type if not provided
+                  if (typeof obj[prop].type === 'undefined') obj[prop].type = _this.plural(_this.camel(prop));
+                  data.relationships[prop] = { data: Object.assign(obj[prop]) };
+                } else throw new Error(`${method} requires an ID for the ${prop} relationships`);
+                // Check if it's a relationship array
+              } else if (obj[prop] !== null && Array.isArray(obj[prop])) {
+                // validate whole array
+                var ptype = _this.plural(_this.camel(prop));
+                if (typeof data.relationships === 'undefined') data.relationships = {};
+                data.relationships[prop] = { data: obj[prop].map(function (elem) {
+                    if (typeof elem.id === 'undefined') throw new Error(`${method} requires an ID for the ${prop} relationships`);
+                    return {
+                      id: elem.id,
+                      type: elem.type || ptype
+                    };
+                  }) };
+              } else if (prop !== 'id' && prop !== 'type') {
+                // Its an attribute
+                if (typeof data.attributes === 'undefined') data.attributes = {};
+                data.attributes[prop] = obj[prop];
+              }
+            };
+
+            for (prop in obj) {
+              _loop(prop);
+            }
+            return _context.abrupt('return', { data });
+
+          case 13:
+            _context.prev = 13;
+            _context.t0 = _context['catch'](0);
+            throw _context.t0;
+
+          case 16:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, this, [[0, 13]]);
+  }));
+
+  return function serialise(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+/**
+ * Converts kebab-case and snake_case into camelCase
+ *
+ * @param {string} s String to convert
+ * @returns {string} camelCase formatted string
+ * @private
+ */
+var camel = (function (s) {
+  return s.replace(/[-_][a-z\u00E0-\u00F6\u00F8-\u00FE]/g, function (match) {
+    return match.slice(1).toUpperCase();
+  });
+});
+
+/**
+ * Converts camelCase into kebab-case
+ *
+ * @param {string} s camelCase string
+ * @returns {string} kekab-case formatted string
+ * @private
+ */
+var kebab = (function (s) {
+  return s.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g, function (match) {
+    return '-' + match.toLowerCase();
+  });
+});
+
+/**
+ * Converts camelCase into snake_case
+ *
+ * @param {string} s camelCase string
+ * @returns {string} snake_case formatted string
+ * @private
+ */
+var snake = (function (s) {
+  return s.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g, function (match) {
+    return '_' + match.toLowerCase();
+  });
+});
+
+var kitsu = 'https://kitsu.io/api/edge';
+var jsonAPI = 'application/vnd.api+json';
+var jsonAPIHeader = { 'Accept': jsonAPI, 'Content-Type': jsonAPI
+
+  /**
+   * A simple framework agnostic JSON-API client JSON API
+   *
+   * @name Kitsu
+   * @param {Object} options Options
+   * @param {string} options.baseURL Set the API endpoint (default `https://kitsu.io/api/edge`)
+   * @param {Object} options.headers Additional headers to send with requests
+   * @param {boolean} options.camelCaseTypes If true, the `type` value will be camelCased, e.g `library-entries` and `library_entries` become `libraryEntries`  (default `true`)
+   * @param {string} options.resourceCase `kebab`, `snake` or `none`. If `kebab`, `/libraryEntries` will become `/library-entries`. If `snake`, `/libraryEntries` will become `/library_entries`, If `none`, `/libraryEntries` will be unchanged (default `kebab`)
+   * @param {boolean} options.pluralize If `true`, `/user` will become `/users` in the URL request and `type` will be pluralized in post, patch and delete requests - `user` -> `users` (default `true`)
+   * @param {number} options.timeout Set the request timeout in milliseconds (default `30000`)
+   *
+   * @example
+   * // If using Kitsu.io's API
+   * const api = new Kitsu()
+   *
+   * @example
+   * // If using another API server
+   * const api = new Kitsu({
+   *   baseURL: 'https://api.example.org/2'
+   * })
+   *
+   * @example
+   * // Set a `user-agent` and an `authorization` token
+   * const api = new Kitsu({
+   *   headers: {
+   *     'User-Agent': 'MyApp/1.0.0 (github.com/username/repo)',
+   *     Authorization: 'Bearer 1234567890'
+   *   }
+   * })
+   */
+};
+var Kitsu = function () {
+  function Kitsu() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Kitsu);
+
+    this.fetch = this.get;
+    this.update = this.patch;
+    this.create = this.post;
+
+    if (options.camelCaseTypes === false) this.camel = function (s) {
+      return s;
+    };else this.camel = camel;
+
+    if (options.resourceCase === 'none') this.resCase = function (s) {
+      return s;
+    };else if (options.resourceCase === 'snake') this.resCase = snake;else this.resCase = kebab;
+
+    if (options.pluralize === false) this.plural = function (s) {
+      return s;
+    };else this.plural = require('pluralize');
+
+    /**
+     * Get the current headers or add additional headers
+     *
+     * @memberof Kitsu
+     * @returns {Object} All the current headers
+     *
+     * @example
+     * // Receive all the headers
+     * api.headers
+     *
+     * @example
+     * // Receive a specific header
+     * api.headers['User-Agent']
+     *
+     * @example
+     * // Add or update a header
+     * api.headers['Authorization'] = 'Bearer 1234567890'
+     */
+    this.headers = Object.assign({}, options.headers, jsonAPIHeader);
+
+    axios.defaults.baseURL = options.baseURL || kitsu;
+    axios.defaults.timeout = options.timeout || 30000;
+  }
+
+  /**
+   * Check if the client is authenticated (oAuth2/Authorization header)
+   *
+   * @memberof Kitsu
+   * @returns {boolean}
+   *
+   * @example
+   * if (api.isAuth) console.log('Authenticated')
+   * else console.log('Not authenticated')
+   */
+
+
+  _createClass(Kitsu, [{
+    key: 'get',
+
+
+    /**
+     * Fetch resources
+     * Aliases: `fetch`
+     *
+     * @memberof Kitsu
+     * @param {string} model Model to fetch data from
+     * @param {Object} params JSON-API request queries
+     * @param {Object} params.page jsonapi.org/format/#fetching-pagination
+     * @param {number} params.page.limit Number of resources to return in request (Max `20` for Kitsu.io except on `libraryEntries` which has a max of `500`)
+     * @param {number} params.page.offset Number of resources to offset the dataset by
+     * @param {Object} params.fields Return a sparse fieldset with only the included attributes/relationships jsonapi.org/format/#fetching-sparse-fieldsets
+     * @param {Object} params.filter Filter dataset by attribute values jsonapi.org/format/#fetching-filtering
+     * @param {string} params.sort Sort dataset by one or more comma separated attributes (prepend `-` for descending order) jsonapi.org/format/#fetching-sorting
+     * @param {string} params.include Include relationship data jsonapi.org/format/#fetching-includes
+     * @param {Object} headers Additional headers to send with request
+     * @returns {Object} JSON-parsed response
+     *
+     * @example
+     * // Get a specific user's name & birthday
+     * api.get('users', {
+     *   fields: {
+     *     users: 'name,birthday'
+     *   },
+     *   filter: {
+     *     name: 'wopian'
+     *   }
+     * })
+     *
+     * @example
+     * // Get a collection of anime resources and their categories
+     * api.get('anime', {
+     *   include: 'categories'
+     * })
+     *
+     * @example
+     * // Get a single resource and its relationships by ID (method one)
+     * api.get('anime', {
+     *   include: 'categories',
+     *   filter: { id: '2' }
+     * })
+     *
+     * @example
+     * // Get a single resource and its relationships by ID (method two)
+     * api.get('anime/2', {
+     *   include: 'categories'
+     * })
+     *
+     * @example
+     * // Get a resource's relationship data only
+     * api.get('anime/2/categories')
+     */
+    value: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(model) {
+        var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        var _model$split, _model$split2, res, id, url, _ref2, data;
+
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.prev = 0;
+                _model$split = model.split('/'), _model$split2 = _slicedToArray(_model$split, 2), res = _model$split2[0], id = _model$split2[1];
+                url = this.plural(this.resCase(res)) + (id ? '/' + id : '');
+                _context.next = 5;
+                return axios.get(url, {
+                  params,
+                  paramsSerializer: function paramsSerializer(p) {
+                    return query(p);
+                  },
+                  headers: Object.assign(this.headers, headers, jsonAPIHeader)
+                });
+
+              case 5:
+                _ref2 = _context.sent;
+                data = _ref2.data;
+                return _context.abrupt('return', deserialise(data));
+
+              case 10:
+                _context.prev = 10;
+                _context.t0 = _context['catch'](0);
+                return _context.abrupt('return', error(_context.t0));
+
+              case 13:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[0, 10]]);
+      }));
+
+      function get(_x2) {
+        return _ref.apply(this, arguments);
+      }
+
+      return get;
+    }()
+
+    /**
+     * Update a resource
+     * Aliases: `update`
+     *
+     * @memberof Kitsu
+     * @param {string} model Model to update data in
+     * @param {Object} body Data to send in the request
+     * @param {Object} headers Additional headers to send with request
+     * @returns {Object} JSON-parsed response
+     *
+     * @example
+     * // Update a user's post (Note: For Kitsu.io, posts cannot be edited 30 minutes after creation)
+     * api.update('posts', {
+     *   id: '12345678',
+     *   content: 'Goodbye World'
+     * })
+     */
+
+  }, {
+    key: 'patch',
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(model, body) {
+        var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        var url, _ref4, data;
+
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.prev = 0;
+
+                headers = Object.assign(this.headers, headers, jsonAPIHeader);
+
+                if (this.isAuth) {
+                  _context2.next = 4;
+                  break;
+                }
+
+                throw new Error('Not logged in');
+
+              case 4:
+                if (!(typeof body.id === 'undefined')) {
+                  _context2.next = 6;
+                  break;
+                }
+
+                throw new Error('Updating a resource requires an ID');
+
+              case 6:
+                url = this.plural(this.resCase(model)) + '/' + body.id;
+                _context2.t0 = axios;
+                _context2.t1 = url;
+                _context2.next = 11;
+                return serialise.apply(this, [model, body, 'PATCH']);
+
+              case 11:
+                _context2.t2 = _context2.sent;
+                _context2.t3 = { headers };
+                _context2.next = 15;
+                return _context2.t0.patch.call(_context2.t0, _context2.t1, _context2.t2, _context2.t3);
+
+              case 15:
+                _ref4 = _context2.sent;
+                data = _ref4.data;
+                return _context2.abrupt('return', data);
+
+              case 20:
+                _context2.prev = 20;
+                _context2.t4 = _context2['catch'](0);
+                return _context2.abrupt('return', error(_context2.t4));
+
+              case 23:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[0, 20]]);
+      }));
+
+      function patch(_x5, _x6) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return patch;
+    }()
+
+    /**
+     * Create a new resource
+     * Aliases: `create`
+     *
+     * @memberof Kitsu
+     * @param {string} model Model to create a resource under
+     * @param {Object} body Data to send in the request
+     * @param {Object} headers Additional headers to send with request
+     * @returns {Object} JSON-parsed response
+     *
+     * @example
+     * // Post to a user's own profile
+     * api.create('posts', {
+     *   content: 'Hello World',
+     *   targetUser: {
+     *     id: '42603',
+     *     type: 'users'
+     *   },
+     *   user: {
+     *     id: '42603',
+     *     type: 'users'
+     *   }
+     * })
+     */
+
+  }, {
+    key: 'post',
+    value: function () {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3(model, body) {
+        var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        var url, _ref6, data;
+
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.prev = 0;
+
+                headers = Object.assign(this.headers, headers, jsonAPIHeader);
+
+                if (this.isAuth) {
+                  _context3.next = 4;
+                  break;
+                }
+
+                throw new Error('Not logged in');
+
+              case 4:
+                url = this.plural(this.resCase(model));
+                _context3.t0 = axios;
+                _context3.t1 = url;
+                _context3.next = 9;
+                return serialise.apply(this, [model, body]);
+
+              case 9:
+                _context3.t2 = _context3.sent;
+                _context3.t3 = { headers };
+                _context3.next = 13;
+                return _context3.t0.post.call(_context3.t0, _context3.t1, _context3.t2, _context3.t3);
+
+              case 13:
+                _ref6 = _context3.sent;
+                data = _ref6.data;
+                return _context3.abrupt('return', data);
+
+              case 18:
+                _context3.prev = 18;
+                _context3.t4 = _context3['catch'](0);
+                return _context3.abrupt('return', error(_context3.t4));
+
+              case 21:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this, [[0, 18]]);
+      }));
+
+      function post(_x8, _x9) {
+        return _ref5.apply(this, arguments);
+      }
+
+      return post;
+    }()
+
+    /**
+     * Remove a resource
+     *
+     * @memberof Kitsu
+     * @param {string} model Model to remove data from
+     * @param {string|number} id Resource ID to remove
+     * @param {Object} headers Additional headers to send with request
+     * @returns {Object} JSON-parsed response
+     *
+     * @example
+     * // Delete a user's post
+     * api.remove('posts', 123)
+     */
+
+  }, {
+    key: 'remove',
+    value: function () {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4(model, id) {
+        var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        var url, _ref8, data;
+
+        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+
+                headers = Object.assign(this.headers, headers, jsonAPIHeader);
+
+                if (this.isAuth) {
+                  _context4.next = 4;
+                  break;
+                }
+
+                throw new Error('Not logged in');
+
+              case 4:
+                url = this.plural(this.resCase(model)) + '/' + id;
+                _context4.t0 = axios;
+                _context4.t1 = url;
+                _context4.next = 9;
+                return serialise.apply(this, [model, { id }, 'DELETE']);
+
+              case 9:
+                _context4.t2 = _context4.sent;
+                _context4.t3 = headers;
+                _context4.t4 = {
+                  data: _context4.t2,
+                  headers: _context4.t3
+                };
+                _context4.next = 14;
+                return _context4.t0.delete.call(_context4.t0, _context4.t1, _context4.t4);
+
+              case 14:
+                _ref8 = _context4.sent;
+                data = _ref8.data;
+                return _context4.abrupt('return', data);
+
+              case 19:
+                _context4.prev = 19;
+                _context4.t5 = _context4['catch'](0);
+                return _context4.abrupt('return', error(_context4.t5));
+
+              case 22:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[0, 19]]);
+      }));
+
+      function remove(_x11, _x12) {
+        return _ref7.apply(this, arguments);
+      }
+
+      return remove;
+    }()
+
+    /**
+     * Get the authenticated user's data
+     * Note: Requires the JSON:API server to support `filter[self]=true`
+     *
+     * @memberof Kitsu
+     * @param {Object} params JSON-API request queries
+     * @param {Object} params.fields Return a sparse fieldset with only the included attributes/relationships jsonapi.org/format/#fetching-sparse-fieldsets
+     * @param {string} params.include Include relationship data jsonapi.org/format/#fetching-includes
+     * @param {Object} headers Additional headers to send with request
+     * @returns {Object} JSON-parsed response
+     *
+     * @example
+     * // Receive all attributes
+     * api.self()
+     *
+     * @example
+     * // Receive a sparse fieldset
+     * api.self({
+     *   fields: 'name,birthday'
+     * })
+     */
+
+  }, {
+    key: 'self',
+    value: function () {
+      var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5() {
+        var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var headers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var res;
+        return _regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.prev = 0;
+                _context5.next = 3;
+                return this.get('users', Object.assign({ filter: { self: true } }, params), headers);
+
+              case 3:
+                res = _context5.sent;
+
+                if (!res.errors) {
+                  _context5.next = 6;
+                  break;
+                }
+
+                throw res;
+
+              case 6:
+                return _context5.abrupt('return', res.data[0]);
+
+              case 9:
+                _context5.prev = 9;
+                _context5.t0 = _context5['catch'](0);
+                return _context5.abrupt('return', error(_context5.t0));
+
+              case 12:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this, [[0, 9]]);
+      }));
+
+      function self() {
+        return _ref9.apply(this, arguments);
+      }
+
+      return self;
+    }()
+  }, {
+    key: 'isAuth',
+    get: function get() {
+      return Boolean(this.headers.Authorization);
+    }
+  }]);
+
+  return Kitsu;
+}();
+
+return Kitsu;
+
+})));
 
 },{"axios":2,"babel-runtime/helpers/asyncToGenerator":31,"babel-runtime/helpers/classCallCheck":32,"babel-runtime/helpers/createClass":33,"babel-runtime/helpers/slicedToArray":34,"babel-runtime/regenerator":35,"pluralize":112}],2:[function(require,module,exports){
 module.exports = require('./lib/axios');

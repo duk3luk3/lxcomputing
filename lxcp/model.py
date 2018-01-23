@@ -30,8 +30,6 @@ class Serializable:
         if sess.logged_in():
             user = sess.user()
             return self.is_visible_for(user)
-        elif sess.node_authed():
-            return True
         else:
             return False
 
@@ -44,8 +42,6 @@ class Serializable:
         if sess.logged_in():
             user = sess.user()
             return self.is_writeable_for(user)
-        elif sess.node_authed():
-            return True
         else:
             return False
 
@@ -240,7 +236,7 @@ class Container(DB_Base, Serializable):
             return False
         if user.is_super_admin:
             return True
-        elif user.group == self.owner.group:
+        elif user.group == self.creator.group:
             return True
         else:
             return False
@@ -250,7 +246,7 @@ class Container(DB_Base, Serializable):
             return False
         if user.is_super_admin:
             return True
-        elif user.is_admin and user == self.owner:
+        elif user.is_admin and user == self.creator:
             return True
         else:
             return False

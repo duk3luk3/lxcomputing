@@ -2,13 +2,26 @@
 <html lang="en">
 <head>
     {% block head %}
+    <link rel="stylesheet" href="/static/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/style.css" />
+    <link href="/static/starter-template.css" rel="stylesheet">
     <link rel="icon" href="/static/favicon.ico" />
     <title>RBG LXCompute - {% block title %}{% endblock %}</title>
+    <style type="text/css">
+th {
+  padding-left: .3em !important;
+  padding-right: .5em !important;
+}
+td {
+  padding-left: .5em !important;
+  padding-right: .5em !important;
+}
+    </style>
     {% endblock %}
 </head>
 <body>
    <script src="/static/jquery-3.2.1.js"></script>
+   <script src="/static/bootstrap.bundle.min.js"></script>
    <!--   <script src="/static/bundle.js"></script>-->
    <!--<script src="/static/axios.js"></script>-->
    <script src="/static/kitsu_dev.js"></script>
@@ -19,6 +32,7 @@ const Kitsu = window.kitsu;
 
 const api = new Kitsu({
     baseURL: '{{config['PREFERRED_URL_SCHEME']}}://{{config['SERVER_NAME']}}/api',
+    timeout: 600000,
     headers: {
         Authorization: 'foobar'
     }
@@ -27,21 +41,66 @@ const api = new Kitsu({
 
 {% endblock %}
 
+{% macro r_nav(tgt, text) -%}{% set is_current = nav == tgt %}
+          <li class="nav-item{% if is_current %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for(tgt) }}">{{text}}{% if is_current %}<span class="sr-only">(current)</span>{% endif %}</a>
+          </li>
+{%- endmacro %}
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="{{url_for('index')}}">LXC Compute</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+{% for name, tgt in content.links %}
+          {{ r_nav(tgt, name) }}
+{% endfor %}
+        </ul>
+	<!--
+        <form class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-sm-2" placeholder="Search" aria-label="Search" type="text">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+	-->
+      </div>
+    </nav>
     <div id="login">
 {% block login %}
 {% if session_data and session_data.logged_in %}
-Welcome, {{session_data.name}}. <a href="/logout">Log out</a>
+Welcome, {{session_data.name}}. <a href="{{url_for('logout')}}">Log out</a>
+<br />
+{% if session_data.user != session_data.real_user %}
+<a href="{{url_for('unpersonate', next=request.endpoint)}}">Stop impersonating {{session_data.name}}</a>
 {% else %}
-<form action="/login" method="POST">
-{% if login_failed %}
-<div class="login_warn">Login failed!</div>
+{% if session_data.real_user.is_admin %}
+<a data-toggle="collapse" href="#collapseImpersonate">Impersonate</a><br />
+<div class="collapse" id="collapseImpersonate">
+    <form action="/login" method="POST">
+    <input type="hidden" name="impersonate" value="1">
+    <input type="hidden" name="next" value="{{request.endpoint}}">
+    Username: <input name="username" />
+    <input type="submit" value="Impersonate" /></td>
+    </form>
+</div>
+<br />
 {% endif %}
+{% endif %}
+
+{% else %}
+<form action="{{url_for('login')}}" method="POST">
 <table>
     <tr><td>Username</td><td><input name="username" /></td></tr>
     <tr><td>Password</td><td><input type="password" name="password" /></td></tr>
     <tr><td></td><td><input type="submit" value="Log In" /></td></tr>
 </table>
 </form>
+{% endif %}
+{% if session_data.login_failed %}
+{% set msg = 'Login failed!' if session_data.login_failed == True else session_data.login_failed %}
+<div class="login_warn">{{msg}}</div>
 {% endif %}
 {% endblock %}
     </div>

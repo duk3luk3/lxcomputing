@@ -177,10 +177,13 @@ def login():
     lib = Lib.get_lib()
 
     username = request.form['username']
-    password = request.form['password']
+    password = request.form.get('password')
+    impersonate = request.form.get('impersonate')
 
-    lib.login(username, password)
-    return redirect('/')
+    target = request.form.get('next', 'index')
+
+    lib.login(username, password, impersonate)
+    return redirect(url_for(target))
 
 @app.route('/logout')
 def logout():
@@ -188,6 +191,15 @@ def logout():
     user_session.clear_login()
 
     return redirect('/')
+
+@app.route('/unpersonate')
+def unpersonate():
+    user_session = Session(session)
+    user_session.clear_impersonation()
+
+    target = request.args.get('next', 'index')
+
+    return redirect(url_for(target))
 
 @app.route('/setup')
 def setup():
