@@ -39,4 +39,9 @@ fi
 echo '%root   ALL=(ALL) NOPASSWD: ALL' >> ${LXC_ROOTFS}/etc/sudoers
 sed -i '/Defaults\tenv_reset/a Defaults\tenv_keep += "ftp_proxy http_proxy https_proxy no_proxy"' ${LXC_ROOTFS}/etc/sudoers
 
+apt update
+apt upgrade -y
+apt install -y openssh-server
+
+
 exit 0
