@@ -69,7 +69,10 @@ class LXClient:
         cmd = ['poweroff']
         res = cont.execute(cmd)
         print(res)
-        cont.stop(wait=True)
+        try:
+            cont.stop(wait=True)
+        except:
+            pass
         #TODO: Use container.publish (but then can't pass alias)
         image_config = {
                 'aliases': [
