@@ -289,7 +289,8 @@ class Session:
         db_group = Group.query.filter(Group.name == struk_group).one_or_none()
 
         if not db_group:
-            db_group = Group(struk_group, False)
+            make_super = User.query.first() is None
+            db_group = Group(struk_group, make_super)
             db_group.save()
 
         if db_user.group != db_group:
