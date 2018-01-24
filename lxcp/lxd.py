@@ -43,7 +43,7 @@ class LXClient:
     def cont_delete(self, host, name):
         container = self.client.containers.get(name)
         if container.status == 'Running':
-            container.stop()
+            container.stop(wait=True)
         container.delete()
 
     def cont_provision(self, host, container):
@@ -55,7 +55,7 @@ class LXClient:
         """
         cont = self.cont_get(host, container.name)
         if cont.status != 'Running':
-            cont.start()
+            cont.start(wait=True)
         p = Path(__file__).parent / 'files' / 'provision.sh'
         with p.open() as f:
             script = f.read()
@@ -69,7 +69,7 @@ class LXClient:
         cmd = ['poweroff']
         res = cont.execute(cmd)
         print(res)
-        cont.stop()
+        cont.stop(wait=True)
         #TODO: Use container.publish (but then can't pass alias)
         image_config = {
                 'aliases': [
@@ -93,7 +93,7 @@ class LXClient:
     def cont_adduser(self, host, container, user):
         cnt = self.cont_get(host, container.name)
         if cnt.status != 'Running':
-            cnt.start()
+            cnt.start(wait=True)
         suser = StrukAuth.get_userdata(user.username)
         add_cmd = ['adduser',
                 '--uid', str(suser['uidNumber']),
