@@ -7,7 +7,7 @@
 	Check out these links available to you:
 	<li>
 {% for name, tgt in content.links %}
-	<ul><a href="{{ tgt }}">{{ name }}</a></ul>
+	<ul><a href="{{ url_for(tgt) }}">{{ name }}</a></ul>
 {% endfor %}
 	</li>
 </div>
