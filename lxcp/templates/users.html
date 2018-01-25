@@ -101,6 +101,22 @@ function userDelete(event) {
             .catch((reason) => console.log(reason));
     }
 }
+function userToggleAdmin(event) {
+    event.preventDefault();
+    var $form = $( this ),
+        user_id = $form.find("input[name='user_id']").val(),
+        make_admin = $form.find("input[name='make_admin']").val();
+
+    api.update(
+        'user', {
+        id: user_id,
+        'is-admin': (make_admin==1)?true:false
+    }).then(function(res) {
+        console.log(res);
+        }
+    })
+     .catch((reason) => console.log(reason));
+}
 </script>
 {% endif %}
 
@@ -129,7 +145,17 @@ $('#group{{group.id}}DeleteForm').submit(groupDelete);
 <table id="group{{group.id}}usersTable">
 <tr><th>ID</th><th>Name</th><th>is_admin</th><th>SSH Key</th></tr>
 {% for user in group.group_members %}
-<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.is_admin }}</td><td><abbr title="{{user.sshkey}}">{{ (user.sshkey|default('', true)).split(' ')|map('truncate', 32)|join(' ') }}</abbr></td>
+<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.is_admin }}
+<form id="user{{user.id}}AdminToggleForm">
+    <input type="hidden" name="user_id" value="{{user.id}}">
+    <input type="hidden" name="make_admin" value="{{'0' if user.is_admin else '1'}}">
+    <input type="submit" value="Toggle">
+</form>
+<script>
+$('#user{{user.id}}AdminToggleForm').submit(userToggleAdmin);
+</script>
+</td>
+<td><abbr title="{{user.sshkey}}">{{ (user.sshkey|default('', true)).split(' ')|map('truncate', 32)|join(' ') }}</abbr></td>
 {% if user.is_writeable_for(session_data.user) %}
 <td>
 <form id="user{{user.id}}DeleteForm">
@@ -157,7 +183,16 @@ $('#user{{user.id}}DeleteForm').submit(userDelete);
 <table>
 <tr><th>ID</th><th>Name</th><th>uidNumber</th><th>is_admin</th></tr>
 {% for user in orphans %}
-<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.uidNumber}}</td><td>{{ user.is_admin }}</td>
+<tr id="user{{user.id}}Row"><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.uidNumber}}</td><td>{{ user.is_admin }}
+<form id="user{{user.id}}AdminToggleForm">
+    <input type="hidden" name="user_id" value="{{user.id}}">
+    <input type="hidden" name="make_admin" value="{{'0' if user.is_admin else '1'}}">
+    <input type="submit" value="Toggle">
+</form>
+<script>
+$('#user{{user.id}}AdminToggleForm').submit(userToggleAdmin);
+</script>
+</td>
 {% if user.is_writeable_for(session_data.user) %}
 <td>
 <form id="user{{user.id}}DeleteForm">

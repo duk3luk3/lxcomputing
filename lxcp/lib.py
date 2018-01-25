@@ -269,8 +269,9 @@ class Session:
         self.session.pop('real_user')
 
     def clear_impersonation(self):
-        self.session.pop('impersonated_username')
-        self.session.pop('impersonated_user')
+        if 'impersonated_username' in self.session:
+            self.session.pop('impersonated_username')
+            self.session.pop('impersonated_user')
 
     def _update_user(self, username, strukdata):
         """Synchronize user/org data from StrukturDB

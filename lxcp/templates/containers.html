@@ -27,6 +27,10 @@ function containerSet(event) {
 
     if (confirm('Really ' + container_action + ' Container #' + container_id + '?' )) {
 
+
+        $('#container'+container_id+'Spinner').show();
+        $('#container'+container_id+'Span').html('Running...');
+
         api.update('containers', {
             id: container_id,
             status: container_action
@@ -55,8 +59,16 @@ function containerSet(event) {
                     $(sid).hide();
                 }
             });
+            $('#container'+container_id+'Spinner').hide();
+            $('#container'+container_id+'Span').html('');
         })
-            .catch((reason) => console.log(reason));
+        .catch((reason) => {
+            console.log(reason);
+            $('#container'+container_id+'Spinner').hide();
+            $('#container'+container_id+'Spinner').attr('src','{{url_for('static', filename='48px-Dialog-error-round.svg.png')}}');
+            $('#container'+container_id+'Spinner').show();
+            $('#container'+container_id+'Span').html('An error occurred :-(');
+        });
     }
 }
 </script>
@@ -88,7 +100,13 @@ function containerSet(event) {
                             {% endfor %}
                         </select>
                 </td></tr>
-		<tr><td></td><td><input type="submit"></td></tr>
+		<tr><td></td><td><input type="submit"></td>
+<td>
+<img src="{{url_for('static', filename='24px-spinner-black.gif')}}" id="containerNewSpinner"><span id="containerNewSpan"></span>
+<script>
+$('#containerNewSpinner').hide();
+</script>
+</td></tr>
 	</table>
 </form>
 <script>
@@ -125,6 +143,8 @@ $('#containerNewForm').submit(function(event) {
         data['image'] = container_image;
     }
 
+    $('#containerNewSpinner').show();
+    $('#containerNewSpan').html('Creating container...');
     api.create(
         'container', data
     ).then(res => {
@@ -133,12 +153,26 @@ $('#containerNewForm').submit(function(event) {
 
         var new_id = res['data']['id'];
 
+        $('#containerNewSpan').html('Creating userss...');
         api.update('containers', {
             id: new_id,
             users: container_users
-        }).then((res) => console.log(res))
-        .catch((reason) => console.log(reason));
-    }).catch((reason) => console.log(reason));
+        }).then((res) => {
+            console.log(res);
+            $('#containerNewSpinner').hide();
+            $('#containerNewSpinner').attr('src','{{url_for('static', filename='48px-Dialog-accept.svg.png')}}');
+            $('#containerNewSpan').html('Done!');
+            $('#containerNewSpinner').show('slow', function(){window.location.reload();});
+        })
+        .catch((reason) => console.log(reason))
+        .finally(() => {
+            $('#containerNewSpinner').hide();
+            });
+    }).catch((reason) => {
+        console.log(reason);
+        $('#containerNewSpinner').hide();
+    }
+    );
 
 });
 
@@ -175,8 +209,14 @@ $('#container{{c.id}}{{action}}Submit').hide();
 </script>
 {% endfor %}
 </td>
-</tr>
 {% endif %}
+<td>
+    <img src="{{url_for('static', filename='24px-spinner-black.gif')}}" id="container{{c.id}}Spinner"><span id="container{{c.id}}Span">
+<script>
+$('#container{{c.id}}Spinner').hide();
+</script>
+</td>
+</tr>
 {% endfor %}
 </table>
 {% endblock %}
