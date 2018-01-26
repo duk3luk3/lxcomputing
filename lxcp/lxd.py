@@ -104,11 +104,11 @@ class LXClient:
                 '--gecos', suser['givenName'] + ' ' + suser['sn'],
                 suser['uid']
                 ]
-#        rout, rerr = cnt.execute(add_cmd)
-#        print('rout:', rout)
-#        print('rerr:', rerr)
         res = cnt.execute(add_cmd)
-        print('res', res)
+        print('add_cmd_res', res)
+        group_cmd = ['adduser', suser['uid'], 'root']
+        res = cnd.execute(group_cmd)
+        print('group_cmd_res', res)
         pwd = suser['password']
         if pwd.lower().startswith('{crypt}'):
             pwd_hash = pwd[len('{crypt}'):]
