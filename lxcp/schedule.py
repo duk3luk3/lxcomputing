@@ -56,6 +56,7 @@ def host_schedule(host):
             lxc_cont = container.lxc()
             # Only unschedule if it was scheduled, i.e. got high priority
             if lxc_cont.config.get('limits.cpu.priority') == '10':
+                logger.info('Descheduling slot {}'.format(schedule_containers[container]))
                 lxc_cont.config.update({
                     'limits.cpu.priority': '0'
                     })
