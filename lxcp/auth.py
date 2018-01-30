@@ -24,7 +24,6 @@ class StrukAuth:
                 'org': str(user.org.UQN),
                 'uidNumber': user.uidNumber,
                 'isRootUser': Group['fmi', 'rbg'] in user.backreferences['group.member'],
-                'password': user.password,
                 'sn': user.sn,
                 'givenName': user.givenName,
                 'isAdmin': user in user.org.admin,
