@@ -31,7 +31,7 @@ dictConfig({
 
 app = Flask(__name__)
 DBFILE = os.environ.get('FLASK_DBFILE', '/srv/lxcompute/lxcompute.sqlite3')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite+pysqlite:///' + DBFILE
 app.config['LXKEY'] = os.environ.get('FLASK_LXKEY')
 app.config['LXCERT'] = os.environ.get('FLASK_LXCERT')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
