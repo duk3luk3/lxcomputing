@@ -37,7 +37,6 @@ app.config['REDIS_URL'] = REDIS_URL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SERVER_NAME'] = os.environ.get('FLASK_SERVER_NAME', 'localhost:5000')
 app.config['SCHEDULER_JOBS'] = [
         {
             'id': 'cont_schedule',

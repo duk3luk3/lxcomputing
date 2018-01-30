@@ -10,4 +10,8 @@ sys.path.insert(0, path)
 
 from lxcp import app
 
-application = app
+def application(environ, start_response):
+    for key, value in environ.items():
+        if key.startswith('FLASK_'):
+            os.environ[key] = value
+    return app
