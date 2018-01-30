@@ -1,17 +1,47 @@
 import pylxd
 from pylxd.models.image import _image_create_from_config
 
+from flask import current_app
+
 from pathlib import Path
 
 from .auth import StrukAuth
+from .model import Host
 
 class LXClient:
     def __init__(self):
-        self.client = pylxd.Client(
-                endpoint='https://localhost:8443',
-                cert=('/home/erlacher/.config/lxc/client.crt','/home/erlacher/.config/lxc/client.key'),
-                verify=False
-                )
+        self.clients = {}
+#        self.client = pylxd.Client(
+#                endpoint='https://localhost:8443',
+#                cert=('/home/erlacher/.config/lxc/client.crt','/home/erlacher/.config/lxc/client.key'),
+#                verify=False
+#                )
+
+    def client_connect(self, hosts):
+        if not hosts:
+            hosts = Host.query.all()
+
+        app = current_app
+        key = app.config['LXKEY']
+        cert = app.config['LXCERT']
+        for host in hosts:
+            if not host.name in self.clients:
+                self.clients[host.name] = pylxd.Client(
+                        endpoint='https://{}:8443'.format(host.name),
+                        cert=(cert, key),
+                        verify=False
+                        )
+
+    def client_trusted(self, host):
+        return self.clients[host.name].trusted
+
+    def client_trust(self, trust_pw, hosts):
+        if not hosts:
+            hosts = Host.query.all()
+        self.client_connect(hosts)
+        for host in hosts:
+            if not self.client_trusted(hosts):
+                self.clients[host.name].authenticate(trust_pw)
 
     def cont_create(self, host, container):
         name = container.name
@@ -33,15 +63,15 @@ class LXClient:
                     } for mapping in mappings
                 }
 
-        container = self.client.containers.create(config, wait=True)
+        container = self.clients[host].containers.create(config, wait=True)
         return container
 
     def cont_get(self, host, name):
-        container = self.client.containers.get(name)
+        container = self.clients[host].containers.get(name)
         return container
 
     def cont_delete(self, host, name):
-        container = self.client.containers.get(name)
+        container = self.clients[host].containers.get(name)
         if container.status == 'Running':
             container.stop(wait=True)
         container.delete()
@@ -86,7 +116,7 @@ class LXClient:
                     'name': container.name
                     }
                 }
-        _image_create_from_config(self.client, image_config, wait=True)
+        _image_create_from_config(self.clients[host], image_config, wait=True)
 
 
     def cont_init(self, host, container):
@@ -132,5 +162,9 @@ class LXClient:
         print('res', res)
 
     def images(self, host):
-        return self.client.images.all()
+        if not host:
+            host = Host.query.first()
+        if not host:
+            return []
+        return self.clients[host].images.all()
 

@@ -15,6 +15,25 @@
 	{% endif %}
 
 </div>
+<h2>Host Authentication</h2>
+
+To authenticate with an LXC host, the client certificate needs to be accepted by the host.
+
+Unauthenticated Hosts:
+{% for host in content.hosts|selectattr('lxc_trusted') %}
+{% if loop.index0 > 0 %}, {% endif %}{{host.name}}
+{% endfor %}
+
+Enter LXC trust password here to attempt LXC authentication with all unauthenticated hosts:
+
+<form method="POST" action="{{url_for('lxc_trust')}}">
+<table>
+    <tr><th>Trust Password</th><td><input type="password" name="trust_pw"></td></tr>
+    <tr><th>Submit</th><td><input type="submit"></tr>
+</table>
+</form>
+
+
 <h2>Container Templates</h2>
 <div>
     Select a running container to provision as new template (<a href="{{url_for('if_containers')}}">Or create one first</a>)

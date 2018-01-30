@@ -177,6 +177,15 @@ class Host(DB_Base, Serializable):
 
         return {'cpu_demand': cpu, 'ram_demand': ram, 'utilisation': utilisation}
 
+    def lxc(self):
+        from .lib import Lib
+        lib = Lib.get_lib()
+        lib.lxclient.client_connect([self])
+        return lib.lxclient
+
+    @property
+    def lxc_trusted(self):
+        return self.lxc().client_trusted(self)
 
 class NFS(DB_Base, Serializable):
     __tablename__ = 'nfs'

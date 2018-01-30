@@ -33,6 +33,8 @@ app = Flask(__name__)
 DBFILE = os.environ.get('FLASK_DBFILE', '/srv/lxcompute/lxcompute.sqlite3')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
+app.config['LXKEY'] = os.environ.get('FLASK_LXKEY')
+app.config['LXCERT'] = os.environ.get('FLASK_LXCERT')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SCHEDULER_JOBS'] = [
         {
@@ -203,6 +205,7 @@ def setup():
     lib = Lib.get_lib()
 
     client = lib.lxclient
+    client.client_connect()
 
     images = client.images(None)
     response = lib.data(classes=({'hosts':Host, 'containers':Container}))
@@ -229,6 +232,14 @@ def container_provision():
     lib.container_provision(container_id)
     return redirect('/setup')
 
+@app.route('/setup/lxc_trust', methods=['POST'])
+def lxc_trust():
+    lib = Lib.get_lib()
+    client = lib.lxclient
+
+    trust_pw = request.form['trust_pw']
+    client.client_trust(trust_pw, None)
+    return redirect('/setup')
 
 @app.route('/data/')
 def show_data():
