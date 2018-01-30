@@ -14,4 +14,4 @@ def application(environ, start_response):
     for key, value in environ.items():
         if key.startswith('FLASK_'):
             os.environ[key] = value
-    return app
+    return app.wsgi_app(environ, start_response)

@@ -4,7 +4,6 @@ from flask import Flask, g, jsonify, abort, redirect, url_for, make_response, re
 from flask.json import JSONEncoder
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_jsonapi import FlaskJSONAPI
-from flask_redis import FlaskRedis
 from flask_apscheduler import APScheduler
 import os
 import sys
@@ -31,9 +30,7 @@ dictConfig({
 
 
 app = Flask(__name__)
-DBFILE = os.environ.get('DBFILE', '/srv/lxcompute/lxcompute.sqlite3')
-REDIS_URL = "redis://:@localhost:6379/0"
-app.config['REDIS_URL'] = REDIS_URL
+DBFILE = os.environ.get('FLASK_DBFILE', '/srv/lxcompute/lxcompute.sqlite3')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DBFILE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -94,7 +91,6 @@ app.config['LXCP_INSTANCES'] = [
 ]
 #app.config['SCHEDULER_API_ENABLED'] = True
 db = SQLAlchemy(app)
-redis_store = FlaskRedis(app)
 from .model import *
 api = FlaskJSONAPI(app, db)
 scheduler = APScheduler(app=app)
