@@ -17,7 +17,7 @@ class LXClient:
 #                verify=False
 #                )
 
-    def client_connect(self, hosts):
+    def client_connect(self, hosts=None):
         if not hosts:
             hosts = Host.query.all()
 
@@ -35,7 +35,7 @@ class LXClient:
     def client_trusted(self, host):
         return self.clients[host.name].trusted
 
-    def client_trust(self, trust_pw, hosts):
+    def client_trust(self, trust_pw, hosts=None):
         if not hosts:
             hosts = Host.query.all()
         self.client_connect(hosts)
@@ -63,15 +63,15 @@ class LXClient:
                     } for mapping in mappings
                 }
 
-        container = self.clients[host].containers.create(config, wait=True)
+        container = self.clients[host.name].containers.create(config, wait=True)
         return container
 
     def cont_get(self, host, name):
-        container = self.clients[host].containers.get(name)
+        container = self.clients[host.name].containers.get(name)
         return container
 
     def cont_delete(self, host, name):
-        container = self.clients[host].containers.get(name)
+        container = self.clients[host.name].containers.get(name)
         if container.status == 'Running':
             container.stop(wait=True)
         container.delete()
@@ -116,7 +116,7 @@ class LXClient:
                     'name': container.name
                     }
                 }
-        _image_create_from_config(self.clients[host], image_config, wait=True)
+        _image_create_from_config(self.clients[host.name], image_config, wait=True)
 
 
     def cont_init(self, host, container):
@@ -166,5 +166,5 @@ class LXClient:
             host = Host.query.first()
         if not host:
             return []
-        return self.clients[host].images.all()
+        return self.clients[host.name].images.all()
 
