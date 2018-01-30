@@ -8,6 +8,9 @@ from pathlib import Path
 from .auth import StrukAuth
 from .model import Host
 
+import logging
+logger = logging.getLogger(__name__)
+
 class LXClient:
     def __init__(self):
         self.clients = {}
@@ -26,6 +29,8 @@ class LXClient:
         cert = app.config['LXCERT']
         for host in hosts:
             if not host.name in self.clients:
+                logger.debug('Connecting LXC Client to {}'.format(host.name))
+
                 self.clients[host.name] = pylxd.Client(
                         endpoint='https://{}:8443'.format(host.name),
                         cert=(cert, key),
@@ -33,6 +38,7 @@ class LXClient:
                         )
 
     def client_trusted(self, host):
+        logger.debug('Checking trust for {}'.format(host))
         return self.clients[host.name].trusted
 
     def client_trust(self, trust_pw, hosts=None):
