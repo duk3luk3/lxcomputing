@@ -14,4 +14,5 @@ def application(environ, start_response):
         if key.startswith('FLASK_'):
             os.environ[key] = value
     from lxcp import app
+    app.config['SERVER_NAME'] = environ.get('HTTP_HOST', environ['SERVER_NAME'])
     return app.wsgi_app(environ, start_response)
