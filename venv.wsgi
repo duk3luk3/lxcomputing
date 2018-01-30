@@ -15,4 +15,5 @@ def application(environ, start_response):
             os.environ[key] = value
     from lxcp import app
     app.config['SERVER_NAME'] = environ.get('HTTP_HOST', environ['SERVER_NAME'])
+    app.config['PREFERRED_URL_SCHEME'] = environ.get('wsgi.url_scheme')
     return app.wsgi_app(environ, start_response)
