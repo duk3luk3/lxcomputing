@@ -8,10 +8,10 @@ with open(activate_this) as file_:
 
 sys.path.insert(0, path)
 
-from lxcp import app
 
 def application(environ, start_response):
     for key, value in environ.items():
         if key.startswith('FLASK_'):
             os.environ[key] = value
+    from lxcp import app
     return app.wsgi_app(environ, start_response)
