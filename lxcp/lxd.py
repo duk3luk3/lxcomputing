@@ -39,14 +39,16 @@ class LXClient:
 
     def client_trusted(self, host):
         logger.debug('Checking trust for {}'.format(host))
-        return self.clients[host.name].trusted
+        trusted = self.clients[host.name].trusted
+        logger.debug('Our trust from {} is {}'.format(host, trusted))
+        return trusted
 
     def client_trust(self, trust_pw, hosts=None):
         if not hosts:
             hosts = Host.query.all()
         self.client_connect(hosts)
         for host in hosts:
-            if not self.client_trusted(hosts):
+            if not self.client_trusted(host):
                 self.clients[host.name].authenticate(trust_pw)
 
     def cont_create(self, host, container):
