@@ -227,6 +227,8 @@ def db_populate():
 @app.route('/setup/container_provision', methods=['POST'])
 def container_provision():
     lib = Lib.get_lib()
+    client = lib.lxclient
+    client.client_connect()
     container_id = int(request.form['container_id'])
     lib.container_provision(container_id)
     return redirect('/setup')
@@ -243,6 +245,8 @@ def lxc_trust():
 @app.route('/data/')
 def show_data():
     lib = Lib.get_lib()
+    client = lib.lxclient
+    client.client_connect()
     response = lib.data()
     return render_template('index.html', **response)
 
@@ -255,6 +259,8 @@ def if_users():
 @app.route('/res/')
 def if_res():
     lib = Lib.get_lib()
+    client = lib.lxclient
+    client.client_connect()
     response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group}))
     return render_template('res.html', **response)
 
@@ -263,6 +269,7 @@ def if_containers():
     lib = Lib.get_lib()
     response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group, 'slots': Slot}))
     client = lib.lxclient
+    client.client_connect()
     images = client.images(None)
     config = current_app.config
     return render_template('containers.html', images=images, **response)
@@ -272,6 +279,7 @@ def if_schedule():
     lib = Lib.get_lib()
     response = lib.data(classes=({'hosts':Host, 'containers':Container, 'nfs':NFS, 'groups':Group, 'slots': Slot}))
     client = lib.lxclient
+    client.client_connect()
     images = client.images(None)
     config = current_app.config
     return render_template('scheduling.html', images=images, instances=config['LXCP_INSTANCES'], **response)
