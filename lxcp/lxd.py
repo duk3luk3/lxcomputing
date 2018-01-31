@@ -136,6 +136,7 @@ class LXClient:
         if cnt.status != 'Running':
             cnt.start(wait=True)
         suser = StrukAuth.get_userdata(user.username)
+        print('suser', suser)
         add_cmd = ['adduser',
                 '--uid', str(suser['uidNumber']),
                 '--disabled-password',

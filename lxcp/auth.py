@@ -25,6 +25,7 @@ class StrukAuth:
                 'uidNumber': user.uidNumber,
                 'isRootUser': Group['fmi', 'rbg'] in user.backreferences['group.member'],
                 'sn': user.sn,
+                'password': user.password,
                 'givenName': user.givenName,
                 'isAdmin': user in user.org.admin,
                 'sshKey': user.sshPublicKey
