@@ -263,7 +263,9 @@ class Container(DB_Base, Serializable):
     def lxc(self):
         from .lib import Lib
         lib = Lib.get_lib()
-        return lib.lxclient.cont_get(self.host, self.name)
+        client = lib.lxclient
+        client.client_connect([self.host])
+        return client.cont_get(self.host, self.name)
 
     @hybrid_property
     def status(self):
