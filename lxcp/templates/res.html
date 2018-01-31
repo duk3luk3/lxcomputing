@@ -80,9 +80,9 @@ These are the available compute hosts, listed here for your information.
 {% endif %}
 
 <table>
-    <tr><th>ID</th><th>Name</th><th>Cores</th><th>RAM (GB)</th><th>Space (TB)</th></tr>
+    <tr><th>ID</th><th>Name</th><th>Cores</th><th>RAM (GB)</th><th>Space (TB)</th><th>Trusted</th></tr>
 {% for host in content.hosts %}
-<tr><td>{{ host.id }}</td><td>{{ host.name }}</td><td>{{ host.ncpu }}</td><td>{{ host.nram }}</td><td>{{ host.nhdd }}</td></tr>
+<tr><td>{{ host.id }}</td><td>{{ host.name }}</td><td>{{ host.ncpu }}</td><td>{{ host.nram }}</td><td>{{ host.nhdd }}</td><td>{{ host.lxc_trusted }}</td></tr>
 {% endfor %}
 </table>
 

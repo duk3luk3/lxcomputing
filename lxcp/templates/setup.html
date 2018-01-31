@@ -20,9 +20,10 @@
 To authenticate with an LXC host, the client certificate needs to be accepted by the host.
 
 Unauthenticated Hosts:
-{% for host in content.hosts|selectattr('lxc_trusted') %}
+{% for host in content.hosts|rejectattr('lxc_trusted') %}
 {% if loop.index0 > 0 %}, {% endif %}{{host.name}}
 {% endfor %}
+<br />
 
 Enter LXC trust password here to attempt LXC authentication with all unauthenticated hosts:
 
