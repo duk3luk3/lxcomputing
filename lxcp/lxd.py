@@ -145,7 +145,7 @@ class LXClient:
         res = cnt.execute(add_cmd)
         print('add_cmd_res', res)
         group_cmd = ['adduser', suser['uid'], 'root']
-        res = cnd.execute(group_cmd)
+        res = cnt.execute(group_cmd)
         print('group_cmd_res', res)
         pwd = suser['password']
         if pwd.lower().startswith('{crypt}'):
