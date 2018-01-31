@@ -14,23 +14,27 @@ from . import lxd
 def container_insert(mapper, connection, container):
     host = container.host
     client = lxd.LXClient()
+    client.client_connect()
     client.cont_create(host, container)
 
 @event.listens_for(Container, 'after_delete')
 def container_delete(mapper, connection, container):
     host = container.host
     client = lxd.LXClient()
+    client.client_connect()
     client.cont_delete(host, container.name)
 
 @event.listens_for(Container.users, 'append')
 def container_user_append(container, user, initiator):
     client = lxd.LXClient()
+    client.client_connect()
     host = container.host
     client.cont_adduser(host, container, user)
 
 @event.listens_for(Container.users, 'remove')
 def container_user_append(container, user, initiator):
     client = lxd.LXClient()
+    client.client_connect()
     host = container.host
     client.cont_deluser(host, container, user)
 
